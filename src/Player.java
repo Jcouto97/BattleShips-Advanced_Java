@@ -1,44 +1,80 @@
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
+// LUIS
 public class Player {
-
     private String name;
-    //score??
-
-//    public static void main(String[] args) {
-//        Client a = new Client();
-//        try {
-//            a.start("localHost", 8082);
-//        } catch (IOException e) {
-//            System.out.println("Chat is under maintenance");
-//        }
-//    }
-//    public void start(String host, int port) throws IOException {
-//        Socket socket = new Socket(host, port);
-//        new Thread(new KeyboardHandler(socket)).start();
-//    }
-
-
-
 
     public Player(String name) {
         this.name = name;
     }
 
-    // LUIS
-    private static class KeyboardHandler implements Runnable {
+    public void start(String host, int port) throws IOException {
+        Socket socket = new Socket(host, port); //criar thread (cada vez que um player se connecta, cria uma nova)
+        new Thread(new KeyboardHandler(socket)).start(); //iniciar thread
+    }
 
+    public static void main(String[] args) {
+        Player player = new Player("Player1"); // !! não sei se o "name" está certo? !!
 
-
-        @Override
-        public void run() {
-            //fazer threads
+        try {
+            player.start("localhost", 8082);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
+    private static class KeyboardHandler implements Runnable {
+        private BufferedWriter writer;
+        private BufferedReader reader;
+        private BufferedReader consoleReader;
+        private Socket keyboardSocket;
 
-    public static void main(String[] args) {
-        //iniciar coisas do player
+        public KeyboardHandler(Socket socket) {
+            // !! não consegui testar porque o start o gameServer ainda não tinha nada !!
+            try {
+                System.out.println("Enter the coordinates:");
+                this.reader = new BufferedReader(new InputStreamReader(System.in));
+                this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                this.keyboardSocket = socket;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            //Read Thread
+            new Thread(() -> {
+                while(!keyboardSocket.isClosed()) { // loop para estar sempre a fazer o readLine (lê o input do player)
+                    try {
+                        String message = reader.readLine();
+
+                        // condição para quando tivermos o "QuitHandle" a funcionar
+                        if (message == null) {
+                            keyboardSocket.close();
+                            continue;
+                        }
+                        System.out.println(message);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // se não fizer isto, o próximo while não correr porque fica preso até que o user submeta algo, mesmo depois de ter saído
+                System.exit(0);
+            }).start();
+
+
+            //Write Thread
+            while(!keyboardSocket.isClosed()) {
+                try {
+                    writer.write(reader.readLine());
+                    writer.newLine();
+                    writer.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
