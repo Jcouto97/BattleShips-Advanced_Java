@@ -1,5 +1,7 @@
 package gameobjects;
 
+import field.Position;
+
 public class Ship {
     private int size;
     private String axis;
