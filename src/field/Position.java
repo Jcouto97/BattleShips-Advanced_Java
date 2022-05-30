@@ -1,3 +1,5 @@
+package field;
+
 public class Position {
     private int x, y;
 

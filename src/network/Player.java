@@ -1,3 +1,5 @@
+package network;
+
 public class Player {
     private String name;
     //score??

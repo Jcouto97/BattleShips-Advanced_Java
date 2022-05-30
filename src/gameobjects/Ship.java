@@ -1,3 +1,5 @@
+package gameobjects;
+
 public class Ship {
     private int size;
     private String axis;

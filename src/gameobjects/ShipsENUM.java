@@ -1,3 +1,5 @@
+package gameobjects;
+
 public enum ShipsENUM {
     TWO_BLOCK_SHIP,
     THREE_BLOCK_SHIP,
