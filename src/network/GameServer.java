@@ -15,7 +15,14 @@ public class GameServer {
     private ExecutorService service;
     private List<PlayerHandler> playerList;
 
-    public GameServer(int port) {
+    // JOAO
+    /*
+    Starts server with port as a parameter;
+    Starts a thread pool with unlimited thread space;
+    Starts a new list were players will be added;
+    Adds number of connections of players to the server;
+     */
+    public void start(int port){
         try {
             this.serverSocket = new ServerSocket(port);
             this.service = Executors.newCachedThreadPool();
@@ -23,28 +30,43 @@ public class GameServer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        int numberOfConnections = 0;
+
+        while (true) {
+            ++numberOfConnections;
+            acceptConnection(numberOfConnections);
+        }
     }
 
     // JOAO
-    public void start(){
-
+    /*
+    Server socket accepts the players socket (? algumas duvidas em como funciona o accept());
+    Created new Player with name (using numOfConnections) and his socket;
+    Invoke addPlayer function (below) on this new PlayerHandler instance;
+     */
+    public void acceptConnection(int numberOfConnections){
+        try {
+            Socket playerSocket = serverSocket.accept();
+            addPlayer(new PlayerHandler("Player -".concat(String.valueOf(numberOfConnections)), playerSocket));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // JOAO
-    public void acceptConnection(){
-
-    }
-
-    // JOAO
+    /*
+    The new PlayerHandler instance will be added to the player list;
+    It's runnable will be submitted to the thread pool
+     */
     public void addPlayer(PlayerHandler player){
-
+        playerList.add(player);
+        service.submit(player);
+        System.out.println(player.getName() + " joined the game!");
     }
 
 
-
-
-
-    private class PlayerHandler{
+    private class PlayerHandler implements Runnable{
+        private String name;
         private Board board;
         private Socket playerSocket;
         private BufferedWriter writer;
@@ -52,7 +74,7 @@ public class GameServer {
         private String message;
 
 
-        public PlayerHandler(Board board, Socket playerSocket, String message) {
+        public PlayerHandler(String name, Socket playerSocket) {
             this.board = board;
             this.playerSocket = playerSocket;
             this.writer = writer;
@@ -79,6 +101,15 @@ public class GameServer {
 
         public String getMessage() {
             return message;
+        }
+
+        @Override
+        public void run() {
+
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }
