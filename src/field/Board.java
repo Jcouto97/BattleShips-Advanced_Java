@@ -1,11 +1,8 @@
 package field;
 
 import gameobjects.Ship;
-
-import java.util.Arrays;
-
 public class Board {
-    private String[][] board;
+    private final String[][] board;
 
     public Board() {
         this.board = new String[10][10]; // mudar para constantes
@@ -16,49 +13,45 @@ public class Board {
     }
 
     private void drawNumbersAndWater(int numberOfRows, int numberOfCols) {
-        for (int i = 0; i < this.board.length; i++) {
-            for (int i1 = 0; i1 < this.board[i].length; i1++) {
-                if(i==0 && i1 == 0){
-                    this.board[i][i1] = " ";
+        for (int rows = 0; rows < this.board.length; rows++) {
+            for (int cols = 0; cols < this.board[rows].length; cols++) {
+                if(rows==0 && cols == 0){
+                    this.board[rows][cols] = " ";
                     continue;
                 }
-                if(i == 0){
-                    this.board[i][i1] = String.valueOf(numberOfRows);
+                if(rows == 0){
+                    this.board[rows][cols] = String.valueOf(numberOfRows);
                     numberOfRows++;
                     continue;
                 }
-                if(i1 == 0){
-                    this.board[i][i1] = String.valueOf(numberOfCols);
+                if(cols == 0){
+                    this.board[rows][cols] = String.valueOf(numberOfCols);
                     numberOfCols++;
                     continue;
                 }
-                this.board[i][i1] = "~";
+                this.board[rows][cols] = "~";
             }
         }
     }
 
     // NUNO
+    //buscar barcos aos enums
+    // 1 de 5 blocos, 1 de 4, 2 de 3, 1 de 2
+    //Ship ship = new Ship(1,"x", new Position(1,2)); mudar 1 e 2 para random
     public void addShip(){
-        //buscar barcos aos enums
-        // 1 de 5 blocos, 1 de 4, 2 de 3, 1 de 2
-        //Ship ship = new Ship(1,"x", new Position(1,2)); mudar 1 e 2 para random
-        Ship ship = new Ship(1,new Position(5,5));
+        Ship ship = new Ship(1,new Position((int) Math.floor(Math.random()*5)+1,(int) Math.floor(Math.random()*5)+1));
         this.board[ship.getPosition().getX()][ship.getPosition().getY()] = "#";
-
     }
 
-    public String[][] getBoard() {
+    // get the full board
+    public String getBoard() {
+        String board="";
+        for (String[] rows : this.board) {
+            for (String cols : rows) {
+                board = board.concat(" " + cols + " ");
+            }
+            board = board.concat("\n");
+        }
         return board;
     }
-
-    public static void main(String[] args) {
-        Board b = new Board();
-        for (int i = 0; i < b.getBoard().length; i++) {
-            for (int i1 = 0; i1 < b.getBoard()[i].length; i1++) {
-                System.out.print(" "+b.getBoard()[i][i1]+" ");
-            }
-            System.out.print("\n");
-        }
-    }
-
 }
