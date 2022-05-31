@@ -1,5 +1,6 @@
 package network;
 
+import commands.Command;
 import field.Board;
 
 import java.io.*;
@@ -89,17 +90,32 @@ public class GameServer {
                 try {
                     send(board.getBoard());
                     this.message = reader.readLine();//o que vem do player //blocking method
-                    send(message);
+                    if(isCommand(message)){
+                        dealWithCommand(message);
+                        send(message);
+                    }
+                    System.out.println("Not a command, try again!");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-        /*public void isCommand() {
 
-        }*/
+        public boolean isCommand(String message) {
+            return message.startsWith("/");
+        }
+
+        public void dealWithCommand(String message){
+            String[] words = message.split(" ", 2);
+            Command command = Command.getCommandFromDescription(words[0]); //para ter o /attack
+
+            if(command==null) return;  //volta para o run
+
+            command.getHandler().command(this, GameServer.this);  //executar o comando
+        }
 
         // NUNO
+
         public void send(String message) {
             try {
                 writer.write(message);
@@ -119,9 +135,7 @@ public class GameServer {
             }
         }
 
-        /*public void dealWithCommand(){
 
-        }*/
 
         public String getMessage() {
             return message;
@@ -133,10 +147,6 @@ public class GameServer {
             return name;
         }
 
-
-        private boolean isCommand(String message) {
-            return false;
-        }
 
         public Socket getPlayerSocket() {
             return playerSocket;
