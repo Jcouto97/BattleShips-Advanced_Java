@@ -65,7 +65,7 @@ public class GameServer {
     }
 
     // Objecto que guarda informação do cliente (Nome, Socket, etc)
-    private class PlayerHandler implements Runnable{
+    public class PlayerHandler implements Runnable{
         private String name;
         private Board board;
         private Socket playerSocket;
