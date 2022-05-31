@@ -39,9 +39,13 @@ public class Board {
 
     // NUNO
     public void addShip() {
-        Ship ship = new Ship(1,new Position(3,5));
-      //  new Position((int) Math.floor(Math.random() * 5) + 1, (int) Math.floor(Math.random() * 5) + 1));
-        this.board[ship.getPosition().getX()][ship.getPosition().getY()] = "#";
+        Ship ship = new Ship(2,new Position((int) Math.floor(Math.random() * 5) + 1, (int) Math.floor(Math.random() * 5) + 1));
+
+        for (int i = 0; i < ship.getFullShip().size(); i++) {
+            this.board[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = "#";
+        }
+
+
     }
 
     // get the full board
