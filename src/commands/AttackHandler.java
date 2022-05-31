@@ -14,14 +14,21 @@ public class AttackHandler implements CommandHandler{
             return;
         }
 
-        // if they are, create
+        // if they are integers, create position of where player wants to attack
         Position hitPosition = new Position(Integer.parseInt(coordinates[1]), Integer.parseInt(coordinates[2]));
+
+        /*
+        iterate through list of players and if name of attacker is different
+        from name of defender, attacks his board
+         */
 
         for (GameServer.PlayerHandler playerName : server.getPlayerList()) {
             if (!player.getName().equals(playerName.getName())) {
                 playerName.getBoard().hit(hitPosition);
+                playerName.send(player.getBoard().getBoard());
             }
         }
+
     }
 
     public boolean isInt(String coordinate){
