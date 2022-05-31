@@ -2,9 +2,7 @@ package network;
 
 import field.Board;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ public class GameServer {
     Starts a new list were players will be added;
     Adds number of connections of players to the server;
      */
-    public void start(int port){
+    public void start(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
             this.service = Executors.newCachedThreadPool();
@@ -46,7 +44,7 @@ public class GameServer {
     Created new Player with name (using numOfConnections) and his socket;
     Invoke addPlayer function (below) on this new PlayerHandler instance;
      */
-    public void acceptConnection(int numberOfConnections){
+    public void acceptConnection(int numberOfConnections) {
         try {
             Socket playerSocket = serverSocket.accept();
             addPlayer(new PlayerHandler("Player -".concat(String.valueOf(numberOfConnections)), playerSocket));
@@ -60,30 +58,42 @@ public class GameServer {
     The new PlayerHandler instance will be added to the player list;
     It's runnable will be submitted to the thread pool
      */
-    public void addPlayer(PlayerHandler player){
+    public void addPlayer(PlayerHandler player) {
         playerList.add(player);
         service.submit(player);
         System.out.println(player.getName() + " joined the game!");
     }
 
     // Objecto que guarda informação do cliente (Nome, Socket, etc)
-    public class PlayerHandler implements Runnable{
+   public class PlayerHandler implements Runnable {
         private String name;
         private Board board;
         private Socket playerSocket;
         private BufferedWriter writer;
-        private BufferedWriter reader;
+        private BufferedReader reader;
         private String message;
 
 
-        public PlayerHandler(String name, Socket playerSocket) {
+        public PlayerHandler(String name, Socket playerSocket) throws IOException {
+            this.name = name;
             this.board = board;
             this.playerSocket = playerSocket;
-            this.writer = writer;
-            this.reader = reader;
-            this.name = name;
+            this.writer = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+            this.reader = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
         }
 
+
+        @Override
+        public void run() {
+            while (!playerSocket.isClosed()) {
+                try {
+                    this.message = reader.readLine();//o que vem do player
+                    send(message);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         /*public void isCommand() {
 
         }*/
@@ -117,13 +127,19 @@ public class GameServer {
         }
 
         // Recebe toda a informação do player
-        @Override
-        public void run() {
-
-        }
 
         public String getName() {
             return name;
         }
+
+
+        private boolean isCommand(String message) {
+            return false;
+        }
+
+        public Socket getPlayerSocket() {
+            return playerSocket;
+        }
     }
 }
+
