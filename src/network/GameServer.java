@@ -1,6 +1,7 @@
 package network;
 
 import field.Board;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -22,7 +23,7 @@ public class GameServer {
     Starts a new list were players will be added;
     Adds number of connections of players to the server;
      */
-    public void start(int port){
+    public void start(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
             this.service = Executors.newCachedThreadPool();
@@ -44,7 +45,7 @@ public class GameServer {
     Created new Player with name (using numOfConnections) and his socket;
     Invoke addPlayer function (below) on this new PlayerHandler instance;
      */
-    public void acceptConnection(int numberOfConnections){
+    public void acceptConnection(int numberOfConnections) {
         try {
             Socket playerSocket = serverSocket.accept();
             addPlayer(new PlayerHandler("Player -".concat(String.valueOf(numberOfConnections)), playerSocket));
@@ -58,14 +59,14 @@ public class GameServer {
     The new PlayerHandler instance will be added to the player list;
     It's runnable will be submitted to the thread pool
      */
-    public void addPlayer(PlayerHandler player){
+    public void addPlayer(PlayerHandler player) {
         playerList.add(player);
         service.submit(player);
         System.out.println(player.getName() + " joined the game!");
     }
 
 
-    private class PlayerHandler implements Runnable{
+    private class PlayerHandler implements Runnable {
         private String name;
         private Board board;
         private Socket playerSocket;
@@ -88,8 +89,16 @@ public class GameServer {
 
         // NUNO
         public void send(String message) {
+            try {
+                writer.write(message);
+                writer.newLine();
+                writer.flush();
 
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+
 
         // NUNO
         public void close() {
