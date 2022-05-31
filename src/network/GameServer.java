@@ -79,6 +79,7 @@ public class GameServer {
             this.playerSocket = playerSocket;
             this.writer = writer;
             this.reader = reader;
+            this.name = name;
         }
 
         /*public void isCommand() {
@@ -86,7 +87,7 @@ public class GameServer {
         }*/
 
         // NUNO
-        public void send() {
+        public void send(String message) {
 
         }
 

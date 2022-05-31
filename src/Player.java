@@ -49,7 +49,6 @@ public class Player {
                 while(!keyboardSocket.isClosed()) { // loop para estar sempre a fazer o readLine (lê o input do player)
                     try {
                         String message = reader.readLine();
-
                         // condição para quando tivermos o "QuitHandle" a funcionar
                         if (message == null) {
                             keyboardSocket.close();
