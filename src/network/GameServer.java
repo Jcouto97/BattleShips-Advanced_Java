@@ -1,6 +1,8 @@
 package network;
 
 import field.Board;
+
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -40,7 +42,7 @@ public class GameServer {
 
     // JOAO
     /*
-    Server socket accepts the players socket (? algumas duvidas em como funciona o accept());
+    Server socket accepts the players socket;
     Created new Player with name (using numOfConnections) and his socket;
     Invoke addPlayer function (below) on this new PlayerHandler instance;
      */
@@ -70,7 +72,7 @@ public class GameServer {
         private Board board;
         private Socket playerSocket;
         private BufferedWriter writer;
-        private BufferedWriter reader;
+        private BufferedReader reader;
         private String message;
 
 
