@@ -55,8 +55,4 @@ public class Board {
         return board;
     }
 
-    public static void main(String[] args) {
-        Board a = new Board();
-        System.out.println(a.getBoard());
-    }
 }
