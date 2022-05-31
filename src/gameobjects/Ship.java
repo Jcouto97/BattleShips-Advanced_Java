@@ -24,7 +24,7 @@ public class Ship {
         fullShip = new ArrayList<>();
         this.size = size;
         this.head = position;
-        ShipsENUM shipDirection = ShipsENUM.values()[(int) Math.floor(Math.random()*ShipsENUM.values().length)];
+        ShipsENUM shipDirection = ShipsENUM.values()[(int) Math.floor(Math.random()*(ShipsENUM.values().length-4))];
         fullShip.add(head);
         Position currentPosition = head;
 

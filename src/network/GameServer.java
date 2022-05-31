@@ -15,6 +15,7 @@ public class GameServer {
     private ServerSocket serverSocket;
     private ExecutorService service;
     private List<PlayerHandler> playerList;
+    private int inc = 0;
 
     /*
     Starts server with port as a parameter;
@@ -35,6 +36,16 @@ public class GameServer {
         while (true) {
             ++numberOfConnections;
             acceptConnection(numberOfConnections);
+            if (numberOfConnections == 2) {
+                playerList.get((int) Math.floor(Math.random()*2)).isAttacker = true;
+                for (PlayerHandler playerHandler : playerList) {
+                    synchronized (playerHandler.lock) {
+                        playerHandler.lock.notifyAll();
+                    }
+
+
+                }
+            }
         }
     }
 
@@ -77,7 +88,8 @@ public class GameServer {
         private final BufferedWriter writer;
         private final BufferedReader reader;
         private String message;
-
+        private boolean isAttacker;
+        private final Object lock = new Object();
 
         public PlayerHandler(String name, Socket playerSocket) throws IOException {
             this.name = name;
@@ -85,28 +97,46 @@ public class GameServer {
             this.playerSocket = playerSocket;
             this.writer = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
             this.reader = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+            this.isAttacker = false;
         }
 
+        public boolean isAttacker() {
+            return isAttacker;
+        }
+
+        public void setAttacker(boolean attacker) {
+            isAttacker = attacker;
+        }
 
         /*
-        Thread that reads what players messages
-        Shows players boards
-        Deals with commands
-         */
+                        Thread that reads what players messages
+                        Shows players boards
+                        Deals with commands
+                         */
         @Override
         public void run() {
             while (!playerSocket.isClosed()) {
                 try {
                     send(board.getYourBoard());
                     send(board.getAdversaryBoard());
+
+                    while (!isAttacker) {
+                        synchronized (lock) {
+                            send("waiting for attacker!");
+                            lock.wait();
+                        }
+                    }
+                    send("You are attacking!");
+
                     this.message = reader.readLine();//o que vem do player //blocking method
-                    if(isCommand(message)){
+                    if (isCommand(message)) {
                         dealWithCommand(message);
-                        send(message);
                     } else if (!isCommand(message)) {
                         send("Not a command, try again!");
                     }
                 } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -123,11 +153,11 @@ public class GameServer {
         Deals with the command by spliting the command with coordinates
         Execute the command, in case it exists
          */
-        public void dealWithCommand(String message){
+        public void dealWithCommand(String message) {
             String[] words = message.split(" ", 2);
             Command command = Command.getCommandFromDescription(words[0]); //para ter o /attack
 
-            if(command==null) return;  //volta para o run
+            if (command == null) return;  //volta para o run
 
             command.getHandler().command(this, GameServer.this);  //executar o comando
         }
@@ -158,7 +188,9 @@ public class GameServer {
             }
         }
 
-
+        public Object getLock() {
+            return lock;
+        }
 
         public String getMessage() {
             return message;

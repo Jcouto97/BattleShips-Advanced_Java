@@ -38,15 +38,20 @@ public class AttackHandler implements CommandHandler {
                 String hit = defender.getPlayerBoard().hit(hitPosition); // defender gets hit by attacker
                 attacker.getPlayerBoard().updateAdversaryBoard(hitPosition, hit); //Update the attackers enemy board;
 
-
                 //Redraws both of the defender boards (attacker and defender);
                 defender.send(defender.getPlayerBoard().getYourBoard());
                 defender.send(defender.getPlayerBoard().getAdversaryBoard());
-
-
+                if (!hit.equals("X")) {
+                    attacker.setAttacker(false);
+                    defender.setAttacker(true);
+                }
             }
         }
-
+        for (GameServer.PlayerHandler players : server.getPlayerList()) {
+            synchronized (players.getLock()) {
+                players.getLock().notifyAll();
+            }
+        }
     }
 
     /*
