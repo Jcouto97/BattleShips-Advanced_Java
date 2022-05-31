@@ -17,15 +17,24 @@ public class AttackHandler implements CommandHandler{
         // if they are integers, create position of where player wants to attack
         Position hitPosition = new Position(Integer.parseInt(coordinates[1]), Integer.parseInt(coordinates[2]));
 
+
         /*
-        iterate through list of players and if name of attacker is different
-        from name of defender, attacks his board
+        iterate through list of players and if name of player1 (attacker) is different
+        from name of player2 (defender), attack player2 board
+
+
+        for each player from the playerList saved in the GameServer,
+        check if the attacker player name is different from the defender player name
+        if it is:
+            attacks player2 board on the position provided;
+            updates defender board (changes "~" to "." or "x" depending on if it was water or a boat)
+
          */
 
-        for (GameServer.PlayerHandler playerName : server.getPlayerList()) {
-            if (!player.getName().equals(playerName.getName())) {
-                playerName.getBoard().hit(hitPosition);
-                playerName.send(playerName.getBoard().getBoard());
+        for (GameServer.PlayerHandler player2 : server.getPlayerList()) {
+            if (!player.getName().equals(player2.getName())) {
+                player2.getPlayerBoard().hit(hitPosition);
+                player2.send(player2.getPlayerBoard().getBoard());
             }
         }
 

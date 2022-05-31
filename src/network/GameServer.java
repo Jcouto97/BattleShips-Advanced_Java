@@ -105,10 +105,17 @@ public class GameServer {
             }
         }
 
+        /*
+        Verifies if message is a command
+         */
         public boolean isCommand(String message) {
             return message.startsWith("/");
         }
 
+        /*
+        Deals with the command by spliting the command with coordinates
+        Execute the command, in case it exists
+         */
         public void dealWithCommand(String message){
             String[] words = message.split(" ", 2);
             Command command = Command.getCommandFromDescription(words[0]); //para ter o /attack
@@ -156,7 +163,7 @@ public class GameServer {
             return playerSocket;
         }
 
-        public Board getBoard() {
+        public Board getPlayerBoard() {
             return board;
         }
     }
