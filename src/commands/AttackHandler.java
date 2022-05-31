@@ -39,6 +39,7 @@ public class AttackHandler implements CommandHandler{
             if (!player.getName().equals(player2.getName())) {
                 player2.getPlayerBoard().hit(hitPosition);
                 player2.send(player2.getPlayerBoard().getBoard());
+                player2.send(player2.getPlayerBoard().getAdversaryBoard());
             }
         }
 

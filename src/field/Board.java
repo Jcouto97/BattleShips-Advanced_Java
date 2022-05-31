@@ -2,9 +2,6 @@ package field;
 
 import gameobjects.Ship;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
 
@@ -73,7 +70,7 @@ public class Board {
         return boardString;
     }
 
-    public String getNewBoard() {
+    public String getAdversaryBoard() {
         Board newBoard = new Board();
         String newBoardString = "";
         for (int i = 0; i < newBoard.getBoard2().length; i++) {
