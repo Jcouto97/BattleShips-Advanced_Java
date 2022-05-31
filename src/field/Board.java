@@ -6,6 +6,13 @@ import gameobjects.ShipsENUM;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/*
+Board is a class that creates game boards
+Creates a board for the attacker and another for the defender
+Creates a list of all the players ships
+Creates an array with all the sizes of the ships in ascendent order
+*/
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
 
@@ -15,6 +22,12 @@ public class Board {
     private final int[] allShipSizes;
     private List<Ship> allTheShips;
 
+
+    /*
+    Constructs the attackers board and defenders board
+    Draws both boards (cloneBoard())
+    Adds ships to attackers board
+    */
     public Board() {
         allShipSizes = new int[]{2, 3, 3, 4, 5};
         allTheShips = new ArrayList<>();
@@ -27,6 +40,10 @@ public class Board {
         addShip();
     }
 
+    /*
+    Creates a clone of the attackers board, filled with water ONLY "~"
+    It's the adversarys board, but only to keep track of where I attack
+     */
     public void cloneBoard() {
         for (int rows = 0; rows < this.yourBoard.length; rows++) {
             for (int cols = 0; cols < this.yourBoard[rows].length; cols++) {
@@ -35,7 +52,9 @@ public class Board {
         }
     }
 
-
+    /*
+    Draw the attackers board with rows and columns, and filled with water "~"
+     */
     private void drawNumbersAndWater(int numberOfRows, int numberOfCols) {
         for (int rows = 0; rows < this.yourBoard.length; rows++) {
             for (int cols = 0; cols < this.yourBoard[rows].length; cols++) {
@@ -58,21 +77,25 @@ public class Board {
         }
     }
 
-    // add ship
+    /*
+    It loops until all the ships are created
+    Creates a new ship with a random position
+    Verifies if it's inside the limit of the board
+    Verifies if there's collision between ships and if there are any ships around it
+    If ship passes all checks, it draws them on the board and adds them to a list of ships
+     */
     public void addShip() {
         int nextIndex = 0;
         while (allShipSizes.length > nextIndex) {
             // creates a new ship
-            Ship ship = new Ship(allShipSizes[nextIndex]
-                    , new Position((int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1
-                    , (int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1));
+            Ship ship = new Ship(allShipSizes[nextIndex], new Position((int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1, (int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1));
 
-//check if ship is inside board and on top of other ship
+            //check if ship is inside board and on top of other ship
             if (!isShipInsideBoard(ship) || isShipOnTopOfOtherShip(ship)) {
                 ship = null;
             }
 
-// draws ship on the board and adds to a list of ships
+            // draws ship on the board and adds to a list of ships
             if (ship != null) {
                 drawShipOnBoard(ship);
                 allTheShips.add(ship);
@@ -82,12 +105,15 @@ public class Board {
     }
 
     // draws ship on the board
+    // for each iterations it sets one piece of the body on the next position
+    // # = ship
     private void drawShipOnBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
-            this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = "#";
+            this.yourBoard[ship.getFullShip().get(i).getX()] [ship.getFullShip().get(i).getY()] = "#";
         }
     }
-// check if ship is inside the board if it is return true if its outside return false
+
+    // check if ship is inside the boards limits if it is return true if its outside return false
     private boolean isShipInsideBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
             if (ship.getFullShip().get(i).getX() < 1
@@ -101,15 +127,22 @@ public class Board {
     }
 
     // check if ship is on top of another and there is no ship around the new ship
+    /*
+
+     */
     private boolean isShipOnTopOfOtherShip(Ship ship) {
-        if (ship == null) return true;
+        if (ship == null) {
+            return true;
+        }
         for (int newShipPositions = 0; newShipPositions < ship.getFullShip().size(); newShipPositions++) {
             for (int indexOfAllShips = 0; indexOfAllShips < allTheShips.size(); indexOfAllShips++) {
                 for (int shipPositions = 0; shipPositions < allTheShips.get(indexOfAllShips).getFullShip().size(); shipPositions++) {
                     if (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).equals(ship.getFullShip().get(newShipPositions))) {
                         return true;
                     }
-                    if (checkIfShipsConnected(ship, newShipPositions, indexOfAllShips, shipPositions)) return true;
+                    if (checkIfShipsConnected(ship, newShipPositions, indexOfAllShips, shipPositions)) {
+                        return true;
+                    }
                 }
             }
         }

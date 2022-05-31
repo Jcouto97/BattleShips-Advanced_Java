@@ -40,6 +40,7 @@ public class Ship {
         return head;
     }
 
+    // head and body of ship
     public List<Position> getFullShip() {
         return fullShip;
     }
