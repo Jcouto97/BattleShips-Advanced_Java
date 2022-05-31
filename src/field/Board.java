@@ -1,14 +1,23 @@
 package field;
 
 import gameobjects.Ship;
+import gameobjects.ShipsENUM;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
 
     private final String[][] board;
 
+    private final int[] allShipSizes;
+    private List<Ship> allTheShips;
+
     public Board() {
         this.board = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE]; // mudar para constantes
+        allShipSizes = new int[]{2, 3, 3, 4, 5};
+        allTheShips = new ArrayList<>();
         int numberOfRows = 1;
         int numberOfCols = 1;
         drawNumbersAndWater(numberOfRows, numberOfCols);
@@ -35,17 +44,81 @@ public class Board {
                 this.board[rows][cols] = "~";
             }
         }
+
     }
 
-    // NUNO
+    // add ship
     public void addShip() {
-        Ship ship = new Ship(2,new Position((int) Math.floor(Math.random() * 5) + 1, (int) Math.floor(Math.random() * 5) + 1));
+        int nextIndex = 0;
+        while (allShipSizes.length > nextIndex) {
+            // creates a new ship
+            Ship ship = new Ship(allShipSizes[nextIndex]
+                    , new Position((int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1
+                    , (int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1));
 
+//check if ship is inside board and on top of other ship
+            if (!isShipInsideBoard(ship) || isShipOnTopOfOtherShip(ship)) {
+                ship = null;
+            }
+
+// draws ship on the board and adds to a list of ships
+            if (ship != null) {
+                drawShipOnBoard(ship);
+                allTheShips.add(ship);
+                nextIndex++;
+            }
+        }
+    }
+
+    // draws ship on the board
+    private void drawShipOnBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
             this.board[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = "#";
         }
+    }
+// check if ship is inside the board if it is return true if its outside return false
+    private boolean isShipInsideBoard(Ship ship) {
+        for (int i = 0; i < ship.getFullShip().size(); i++) {
+            if (ship.getFullShip().get(i).getX() < 1
+                    || ship.getFullShip().get(i).getY() < 1
+                    || ship.getFullShip().get(i).getX() > BOARD_MAX_SIZE - 1
+                    || ship.getFullShip().get(i).getY() > BOARD_MAX_SIZE - 1) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    // check if ship is on top of another and there is no ship around the new ship
+    private boolean isShipOnTopOfOtherShip(Ship ship) {
+        if (ship == null) return true;
+        for (int newShipPositions = 0; newShipPositions < ship.getFullShip().size(); newShipPositions++) {
+            for (int indexOfAllShips = 0; indexOfAllShips < allTheShips.size(); indexOfAllShips++) {
+                for (int shipPositions = 0; shipPositions < allTheShips.get(indexOfAllShips).getFullShip().size(); shipPositions++) {
+                    if (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).equals(ship.getFullShip().get(newShipPositions))) {
+                        return true;
+                    }
+                    if (checkIfShipsConnected(ship, newShipPositions, indexOfAllShips, shipPositions)) return true;
+                }
+            }
+        }
+        return false;
+    }
+//check if the new ship created is connected to the other ships
+    private boolean checkIfShipsConnected(Ship ship, int newShipPositions, int indexOfAllShips, int shipPositions) {
+        for (int indexShipEnum = 0; indexShipEnum < ShipsENUM.values().length; indexShipEnum++) {
+            if (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).getX() == (ship.getFullShip()
+                    .get(newShipPositions).getX() + ShipsENUM.values()[indexShipEnum].getAxisX())
+                    && (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).getY() == (ship.getFullShip()
+                    .get(newShipPositions).getY() + ShipsENUM.values()[indexShipEnum].getAxisY()))) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public List<Ship> getAllTheShips() {
+        return allTheShips;
     }
 
     // get the full board
