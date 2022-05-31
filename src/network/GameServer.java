@@ -92,10 +92,9 @@ public class GameServer {
         public void run() {
             while (!playerSocket.isClosed()) {
                 try {
-                    send(board.getBoard());
+                    send(board.getYourBoard());
                     send(board.getAdversaryBoard());
                     this.message = reader.readLine();//o que vem do player //blocking method
-                    send("========================================");
                     if(isCommand(message)){
                         dealWithCommand(message);
                         send(message);
