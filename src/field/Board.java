@@ -32,6 +32,7 @@ public class Board {
             }
         }
     }
+
     private void drawNumbersAndWater(int numberOfRows, int numberOfCols) {
         for (int rows = 0; rows < this.board.length; rows++) {
             for (int cols = 0; cols < this.board[rows].length; cols++) {
@@ -55,30 +56,35 @@ public class Board {
     }
 
     public void addShip() {
-        Ship ship = new Ship(1,new Position(3,5));
-      //  new Position((int) Math.floor(Math.random() * 5) + 1, (int) Math.floor(Math.random() * 5) + 1));
+        Ship ship = new Ship(1, new Position(3, 5));
+        //  new Position((int) Math.floor(Math.random() * 5) + 1, (int) Math.floor(Math.random() * 5) + 1));
         this.board[ship.getPosition().getX()][ship.getPosition().getY()] = "#";
     }
 
     // get the full board
-    public String getBoard(String board) {
-        board = "";
+    public String getBoard() {
+        String boardString = "";
         for (String[] rows : this.board) {
             for (String cols : rows) {
-                board = board.concat(" " + cols + " ");
+                boardString = boardString.concat(" " + cols + " ");
             }
-            board = board.concat("\n");
+            boardString = boardString.concat("\n");
         }
-        return board;
+        return boardString;
     }
 
-//    Board a = new Board();
-//        for (int i = 0; i < a.getBoard2().length; i++) {
-//        for (int i1 = 0; i1 < a.board2[i].length; i1++) {
-//            System.out.print(" " + a.getBoard2()[i][i1]+ " ");
-//        }
-//        System.out.print("\n");
-//    }
+    public String getNewBoard() {
+        Board newBoard = new Board();
+        String newBoardString = "";
+        for (int i = 0; i < newBoard.getBoard2().length; i++) {
+            for (int j = 0; j < newBoard.board2[i].length; j++) {
+                newBoardString = newBoardString.concat(" " + newBoard.getBoard2()[i][j] + " ");
+            }
+            newBoardString = newBoardString.concat("\n");
+        }
+        return newBoardString;
+    }
+
 
     public void hit(Position position) {
         if (isShip(position)) {
@@ -97,7 +103,7 @@ public class Board {
         Board a = new Board();
         for (int i = 0; i < a.getBoard2().length; i++) {
             for (int i1 = 0; i1 < a.board2[i].length; i1++) {
-                System.out.print(" " + a.getBoard2()[i][i1]+ " ");
+                System.out.print(" " + a.getBoard2()[i][i1] + " ");
             }
             System.out.print("\n");
         }
