@@ -9,42 +9,52 @@ import java.util.List;
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
 
-    private final String[][] board;
+    private final String[][] yourBoard;
+    private final String[][] enemyBoard;
 
     private final int[] allShipSizes;
     private List<Ship> allTheShips;
 
     public Board() {
-        this.board = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE]; // mudar para constantes
         allShipSizes = new int[]{2, 3, 3, 4, 5};
         allTheShips = new ArrayList<>();
+        this.yourBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
+        this.enemyBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
         int numberOfRows = 1;
         int numberOfCols = 1;
         drawNumbersAndWater(numberOfRows, numberOfCols);
+        cloneBoard();
         addShip();
     }
 
+    public void cloneBoard() {
+        for (int rows = 0; rows < this.yourBoard.length; rows++) {
+            for (int cols = 0; cols < this.yourBoard[rows].length; cols++) {
+                this.enemyBoard[rows][cols] = this.yourBoard[rows][cols];
+            }
+        }
+    }
+
     private void drawNumbersAndWater(int numberOfRows, int numberOfCols) {
-        for (int rows = 0; rows < this.board.length; rows++) {
-            for (int cols = 0; cols < this.board[rows].length; cols++) {
+        for (int rows = 0; rows < this.yourBoard.length; rows++) {
+            for (int cols = 0; cols < this.yourBoard[rows].length; cols++) {
                 if (rows == 0 && cols == 0) {
-                    this.board[rows][cols] = " ";
+                    this.yourBoard[rows][cols] = " ";
                     continue;
                 }
                 if (rows == 0) {
-                    this.board[rows][cols] = String.valueOf(numberOfRows);
+                    this.yourBoard[rows][cols] = String.valueOf(numberOfRows);
                     numberOfRows++;
                     continue;
                 }
                 if (cols == 0) {
-                    this.board[rows][cols] = String.valueOf(numberOfCols);
+                    this.yourBoard[rows][cols] = String.valueOf(numberOfCols);
                     numberOfCols++;
                     continue;
                 }
-                this.board[rows][cols] = "~";
+                this.yourBoard[rows][cols] = "~";
             }
         }
-
     }
 
     // add ship
@@ -73,7 +83,7 @@ public class Board {
     // draws ship on the board
     private void drawShipOnBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
-            this.board[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = "#";
+            this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = "#";
         }
     }
 // check if ship is inside the board if it is return true if its outside return false
@@ -122,27 +132,45 @@ public class Board {
     }
 
     // get the full board
-    public String getBoard() {
-        String board = "";
-        for (String[] rows : this.board) {
+    public String getYourBoard() {
+        String boardString = "";
+        for (String[] rows : this.yourBoard) {
             for (String cols : rows) {
-                board = board.concat(" " + cols + " ");
+                boardString = boardString.concat(" " + cols + " ");
             }
-            board = board.concat("\n");
+            boardString = boardString.concat("\n");
         }
-        return board;
+        return boardString;
     }
 
-    public void hit(Position position) {
-        if (isShip(position)) {
-            board[position.getX()][position.getY()] = "X";
-            return;
+    public String getAdversaryBoard() {
+        String newBoardString = "";
+        for (String[] strings : this.enemyBoard) {
+            for (String string : strings) {
+                newBoardString = newBoardString.concat(" " + string + " ");
+            }
+            newBoardString = newBoardString.concat("\n");
         }
-        board[position.getX()][position.getY()] = ".";
+        return newBoardString;
+    }
+// updating enemy board from the attacker
+public void updateAdversaryBoard(Position position,String hit){
+    enemyBoard[position.getX()][position.getY()] = hit;
+}
+//update the defender board
+    public String hit(Position position) {
+        if (isShip(position)) {
+            yourBoard[position.getX()][position.getY()] = "X";
+            return "X";
+        }
+        yourBoard[position.getX()][position.getY()] = ".";
+        return ".";
     }
 
     private boolean isShip(Position position) {
-        if (board[position.getX()][position.getY()].equals("#")) return true;
+        if (yourBoard[position.getX()][position.getY()].equals("#") || enemyBoard[position.getX()][position.getY()].equals("#")) {
+            return true;
+        }
         return false;
     }
 
