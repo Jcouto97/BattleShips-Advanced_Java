@@ -1,6 +1,7 @@
 package commands;
 
 public enum Command {
+    ATTACK("/attack", new AttackHandler()),
     QUIT ("/quit", new QuitHandler()),
     RANDOM ("/random", new RandomHandler()),
     READY ("/ready", new ReadyHandler());
