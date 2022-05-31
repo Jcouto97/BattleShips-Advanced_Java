@@ -15,7 +15,7 @@ public class Player {
     }
 
     public static void main(String[] args) {
-        Player player = new Player("Player1"); // !! não sei se o "name" está certo? !!
+        Player player = new Player("placeholder");
 
         try {
             player.start("localhost", 8082);
@@ -31,7 +31,6 @@ public class Player {
         private Socket keyboardSocket;
 
         public KeyboardHandler(Socket socket) {
-            // !! não consegui testar porque o start o gameServer ainda não tinha nada !!
             try {
                 System.out.println("Enter the coordinates:");
                 this.reader = new BufferedReader(new InputStreamReader(System.in));

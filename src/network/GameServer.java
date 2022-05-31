@@ -64,7 +64,7 @@ public class GameServer {
         System.out.println(player.getName() + " joined the game!");
     }
 
-
+    // Objecto que guarda informação do cliente (Nome, Socket, etc)
     private class PlayerHandler implements Runnable{
         private String name;
         private Board board;
@@ -91,9 +91,12 @@ public class GameServer {
 
         }
 
-        // NUNO
         public void close() {
-
+            try {
+                playerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         /*public void dealWithCommand(){
@@ -104,6 +107,7 @@ public class GameServer {
             return message;
         }
 
+        // Recebe toda a informação do player
         @Override
         public void run() {
 
