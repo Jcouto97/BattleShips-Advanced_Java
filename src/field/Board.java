@@ -8,7 +8,8 @@ import java.util.Collections;
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
 
-    private final String[][] board, board2;
+    private final String[][] board;
+    private final String[][] board2;
 
     public Board() {
         this.board = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
@@ -16,12 +17,7 @@ public class Board {
         int numberOfRows = 1;
         int numberOfCols = 1;
         drawNumbersAndWater(numberOfRows, numberOfCols);
-
-        for (int rows = 0; rows < this.board.length; rows++) {
-            for (int cols = 0; cols < this.board[rows].length; cols++) {
-                this.board2[rows][cols] = this.board[rows][cols];
-            }
-        }
+        cloneBoard();
         addShip();
     }
 
@@ -29,6 +25,13 @@ public class Board {
         return board2;
     }
 
+    public void cloneBoard() {
+        for (int rows = 0; rows < this.board.length; rows++) {
+            for (int cols = 0; cols < this.board[rows].length; cols++) {
+                this.board2[rows][cols] = this.board[rows][cols];
+            }
+        }
+    }
     private void drawNumbersAndWater(int numberOfRows, int numberOfCols) {
         for (int rows = 0; rows < this.board.length; rows++) {
             for (int cols = 0; cols < this.board[rows].length; cols++) {
@@ -58,8 +61,8 @@ public class Board {
     }
 
     // get the full board
-    public String getBoard() {
-        String board = "";
+    public String getBoard(String board) {
+        board = "";
         for (String[] rows : this.board) {
             for (String cols : rows) {
                 board = board.concat(" " + cols + " ");
@@ -68,6 +71,14 @@ public class Board {
         }
         return board;
     }
+
+//    Board a = new Board();
+//        for (int i = 0; i < a.getBoard2().length; i++) {
+//        for (int i1 = 0; i1 < a.board2[i].length; i1++) {
+//            System.out.print(" " + a.getBoard2()[i][i1]+ " ");
+//        }
+//        System.out.print("\n");
+//    }
 
     public void hit(Position position) {
         if (isShip(position)) {
