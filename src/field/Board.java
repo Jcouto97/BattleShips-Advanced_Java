@@ -5,13 +5,15 @@ import gameobjects.Ship;
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
 
-    private final String[][] board;
+    private final String[][] board, board2;
 
     public Board() {
-        this.board = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE]; // mudar para constantes
+        this.board = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
+        this.board2 = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
         int numberOfRows = 1;
         int numberOfCols = 1;
         drawNumbersAndWater(numberOfRows, numberOfCols);
+        drawBoard2(numberOfRows, numberOfCols);
         addShip();
     }
 
@@ -37,7 +39,29 @@ public class Board {
         }
     }
 
-    // NUNO
+    private void drawBoard2(int numberOfRows, int numberOfCols) {
+        for (int rows = 0; rows < this.board2.length; rows++) {
+            for (int cols = 0; cols < this.board2[rows].length; cols++) {
+                if (rows == 0 && cols == 0) {
+                    this.board[rows][cols] = " ";
+                    continue;
+                }
+                if (rows == 0) {
+                    this.board[rows][cols] = String.valueOf(numberOfRows);
+                    numberOfRows++;
+                    continue;
+                }
+                if (cols == 0) {
+                    this.board[rows][cols] = String.valueOf(numberOfCols);
+                    numberOfCols++;
+                    continue;
+                }
+                this.board[rows][cols] = "~";
+            }
+        }
+    }
+
+
     public void addShip() {
         Ship ship = new Ship(1,new Position(3,5));
       //  new Position((int) Math.floor(Math.random() * 5) + 1, (int) Math.floor(Math.random() * 5) + 1));
