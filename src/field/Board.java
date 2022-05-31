@@ -35,6 +35,7 @@ public class Board {
         }
     }
 
+
     private void drawNumbersAndWater(int numberOfRows, int numberOfCols) {
         for (int rows = 0; rows < this.yourBoard.length; rows++) {
             for (int cols = 0; cols < this.yourBoard[rows].length; cols++) {

@@ -6,6 +6,7 @@ public enum Command {
     RANDOM ("/random", new RandomHandler()),
     READY ("/ready", new ReadyHandler());
 
+
     private String description;
     private CommandHandler handler;
 

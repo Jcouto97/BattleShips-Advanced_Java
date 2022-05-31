@@ -7,3 +7,4 @@ public class ServerLauncher {
         gameServer.start(8082);
     }
 }
+

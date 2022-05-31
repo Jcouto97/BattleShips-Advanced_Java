@@ -9,6 +9,7 @@ public class Player {
         this.name = name;
     }
 
+
     public void start(String host, int port) throws IOException {
         Socket socket = new Socket(host, port); //criar thread (cada vez que um player se connecta, cria uma nova)
         new Thread(new KeyboardHandler(socket)).start(); //iniciar thread

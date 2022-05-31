@@ -4,6 +4,7 @@ This make the body of the ship
 take the Head of the ship and
 creates a body randomize to one the enums.
  */
+
 public enum ShipsENUM {
     SHIP_LEFT(-1,0),
     SHIP_RIGHT(1,0),

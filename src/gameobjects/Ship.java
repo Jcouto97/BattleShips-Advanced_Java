@@ -5,6 +5,7 @@ import field.Position;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Ship {
     private int size; // size of the ship
     private Position head; //   private String axis;
