@@ -6,20 +6,29 @@ import network.GameServer;
 public class AttackHandler implements CommandHandler{
     @Override
     public void command(GameServer.PlayerHandler player, GameServer server) {
+        // divide message sent by the player into an array, to get attack coordinates after
         String[] coordinates = player.getMessage().split(" ");
 
-        // verificar se o que o player escreveu são coordenadas (integers)
-        if (!(isInt(coordinates[1]) && isInt(coordinates[2]))){
+        // check if what the player wrote were integers
+        if (!isInt(coordinates[1]) && !isInt(coordinates[2])){
             return;
         }
+
+        // if they are integers, create position of where player wants to attack
         Position hitPosition = new Position(Integer.parseInt(coordinates[1]), Integer.parseInt(coordinates[2]));
 
-        GameServer gameServer = new GameServer();
-        for (GameServer.PlayerHandler playerName : gameServer.getPlayerList()) {
+        /*
+        iterate through list of players and if name of attacker is different
+        from name of defender, attacks his board
+         */
+
+        for (GameServer.PlayerHandler playerName : server.getPlayerList()) {
             if (!player.getName().equals(playerName.getName())) {
                 playerName.getBoard().hit(hitPosition);
+                playerName.send(player.getBoard().getBoard());
             }
         }
+
     }
 
     public boolean isInt(String coordinate){
