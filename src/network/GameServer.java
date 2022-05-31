@@ -76,7 +76,7 @@ public class GameServer {
 
         public PlayerHandler(String name, Socket playerSocket) throws IOException {
             this.name = name;
-            this.board = board;
+            this.board = new Board();
             this.playerSocket = playerSocket;
             this.writer = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
             this.reader = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
@@ -87,7 +87,8 @@ public class GameServer {
         public void run() {
             while (!playerSocket.isClosed()) {
                 try {
-                    this.message = reader.readLine();//o que vem do player
+                    send(board.getBoard());
+                    this.message = reader.readLine();//o que vem do player //blocking method
                     send(message);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
