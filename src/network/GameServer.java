@@ -156,7 +156,7 @@ public class GameServer {
             return playerSocket;
         }
 
-        public Board getBoard() {
+        public Board getPlayerBoard() {
             return board;
         }
     }
