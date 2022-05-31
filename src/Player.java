@@ -36,6 +36,7 @@ public class Player {
                 this.reader = new BufferedReader(new InputStreamReader(System.in));
                 this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 this.keyboardSocket = socket;
+                this.consoleReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -47,7 +48,7 @@ public class Player {
             new Thread(() -> {
                 while(!keyboardSocket.isClosed()) { // loop para estar sempre a fazer o readLine (lê o input do player)
                     try {
-                        String message = reader.readLine();
+                        String message = consoleReader.readLine();
                         // condição para quando tivermos o "QuitHandle" a funcionar
                         if (message == null) {
                             keyboardSocket.close();
@@ -66,7 +67,8 @@ public class Player {
             //Write Thread
             while(!keyboardSocket.isClosed()) {
                 try {
-                    writer.write(reader.readLine());
+                    String message = reader.readLine();
+                    writer.write(message);
                     writer.newLine();
                     writer.flush();
                 } catch (IOException e) {
