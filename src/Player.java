@@ -35,8 +35,8 @@ public class Player {
                 System.out.println("Enter the coordinates:");
                 this.reader = new BufferedReader(new InputStreamReader(System.in));
                 this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                this.consoleReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 this.keyboardSocket = socket;
-                this.consoleReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -62,7 +62,6 @@ public class Player {
                 // se não fizer isto, o próximo while não correr porque fica preso até que o user submeta algo, mesmo depois de ter saído
                 System.exit(0);
             }).start();
-
 
             //Write Thread
             while(!keyboardSocket.isClosed()) {

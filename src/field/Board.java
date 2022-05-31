@@ -2,10 +2,12 @@ package field;
 
 import gameobjects.Ship;
 public class Board {
+    private final static int BOARD_MAX_SIZE = 10;
+
     private final String[][] board;
 
     public Board() {
-        this.board = new String[10][10]; // mudar para constantes
+        this.board = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE]; // mudar para constantes
         int numberOfRows = 1;
         int numberOfCols = 1;
         drawNumbersAndWater(numberOfRows, numberOfCols);
@@ -35,9 +37,6 @@ public class Board {
     }
 
     // NUNO
-    //buscar barcos aos enums
-    // 1 de 5 blocos, 1 de 4, 2 de 3, 1 de 2
-    //Ship ship = new Ship(1,"x", new Position(1,2)); mudar 1 e 2 para random
     public void addShip(){
         Ship ship = new Ship(1,new Position((int) Math.floor(Math.random()*5)+1,(int) Math.floor(Math.random()*5)+1));
         this.board[ship.getPosition().getX()][ship.getPosition().getY()] = "#";
