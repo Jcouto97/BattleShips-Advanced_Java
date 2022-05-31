@@ -5,10 +5,6 @@ import network.GameServer;
 
 public class AttackHandler implements CommandHandler {
 
-    /*ASDASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS*/
-    //testing
-
-
     @Override
     public void command(GameServer.PlayerHandler player, GameServer server) {
         // divide message sent by the player into an array, to get attack coordinates after

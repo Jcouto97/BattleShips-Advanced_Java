@@ -10,14 +10,23 @@ public enum Command {
     private String description;
     private CommandHandler handler;
 
+    /*
+    Chat commands
+     */
     Command(String description, CommandHandler handler){
         this.description = description;
         this.handler = handler;
     }
 
+
+    /*
+    Gets a command from the description given
+     */
     public static Command getCommandFromDescription(String description) {
         for (int i = 0; i < Command.values().length; i++) {
-            if(Command.values()[i].description.equals(description))return Command.values()[i];
+            if(Command.values()[i].description.equals(description)) {
+                return Command.values()[i];
+            }
         }
         return null;
     }

@@ -3,20 +3,24 @@ import java.net.Socket;
 
 // LUIS
 public class Player {
-    private String name;
 
-    public Player(String name) {
-        this.name = name;
+    public Player() {
     }
 
-
+    /*
+    Creating server socket
+    Creates a new thread for each KeyboardHandler (player I/O)
+     */
     public void start(String host, int port) throws IOException {
         Socket socket = new Socket(host, port); //criar thread (cada vez que um player se connecta, cria uma nova)
         new Thread(new KeyboardHandler(socket)).start(); //iniciar thread
     }
 
+    /*
+    Connecting the player to a server
+     */
     public static void main(String[] args) {
-        Player player = new Player("placeholder");
+        Player player = new Player();
 
         try {
             player.start("localhost", 8082);
@@ -42,7 +46,9 @@ public class Player {
                 e.printStackTrace();
             }
         }
-
+        /*
+        Thread to read players input
+         */
         @Override
         public void run() {
             //Read Thread
@@ -64,7 +70,7 @@ public class Player {
                 System.exit(0);
             }).start();
 
-            //Write Thread
+            //Thread to write players output
             while(!keyboardSocket.isClosed()) {
                 try {
                     String message = reader.readLine();

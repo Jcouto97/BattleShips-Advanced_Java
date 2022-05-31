@@ -5,7 +5,11 @@ import java.util.Objects;
 public class Position {
     private int x, y;
 
-    public Position(int x, int y) { //cabeça do barco
+    /*
+    Creates a position with x and y coordinates
+     */
+
+    public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -18,7 +22,9 @@ public class Position {
         return y;
     }
 
-
+    /*
+    Equals and hashCode methods overriden to compare the position objects and attributes
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -16,7 +16,6 @@ public class GameServer {
     private ExecutorService service;
     private List<PlayerHandler> playerList;
 
-    // JOAO
     /*
     Starts server with port as a parameter;
     Starts a thread pool with unlimited thread space;
@@ -39,7 +38,6 @@ public class GameServer {
         }
     }
 
-    // JOAO
     /*
     Server socket accepts the players socket;
     Created new Player with name (using numOfConnections) and his socket;
@@ -54,7 +52,6 @@ public class GameServer {
         }
     }
 
-    // JOAO
     /*
     The new PlayerHandler instance will be added to the player list;
     It's runnable will be submitted to the thread pool
@@ -69,13 +66,16 @@ public class GameServer {
         return playerList;
     }
 
-    // Objecto que guarda informação do cliente (Nome, Socket, etc)
+
+    /*
+    Object that stores each player info
+     */
     public class PlayerHandler implements Runnable {
-        private String name;
-        private Board board;
-        private Socket playerSocket;
-        private BufferedWriter writer;
-        private BufferedReader reader;
+        private final String name;
+        private final Board board;
+        private final Socket playerSocket;
+        private final BufferedWriter writer;
+        private final BufferedReader reader;
         private String message;
 
 
@@ -88,7 +88,11 @@ public class GameServer {
         }
 
 
-
+        /*
+        Thread that reads what players messages
+        Shows players boards
+        Deals with commands
+         */
         @Override
         public void run() {
             while (!playerSocket.isClosed()) {
@@ -128,8 +132,10 @@ public class GameServer {
             command.getHandler().command(this, GameServer.this);  //executar o comando
         }
 
-        // NUNO
 
+        /*
+        Deals with buffers
+         */
         public void send(String message) {
             try {
                 writer.write(message);
@@ -141,6 +147,9 @@ public class GameServer {
             }
         }
 
+        /*
+        Closes player socket
+         */
         public void close() {
             try {
                 playerSocket.close();
@@ -155,12 +164,10 @@ public class GameServer {
             return message;
         }
 
-        // Recebe toda a informação do player
 
         public String getName() {
             return name;
         }
-
 
         public Socket getPlayerSocket() {
             return playerSocket;
