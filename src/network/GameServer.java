@@ -98,7 +98,7 @@ public class GameServer {
                         dealWithCommand(message);
                         send(message);
                     }
-                    System.out.println("Not a command, try again!");
+                    send("Not a command, try again!");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
