@@ -71,11 +71,10 @@ public class Board {
     }
 
     public String getAdversaryBoard() {
-        Board newBoard = new Board();
         String newBoardString = "";
-        for (int i = 0; i < newBoard.getBoard2().length; i++) {
-            for (int j = 0; j < newBoard.board2[i].length; j++) {
-                newBoardString = newBoardString.concat(" " + newBoard.getBoard2()[i][j] + " ");
+        for (int i = 0; i < this.board2.length; i++) {
+            for (int j = 0; j < this.board2[i].length; j++) {
+                newBoardString = newBoardString.concat(" " + this.board2[i][j] + " ");
             }
             newBoardString = newBoardString.concat("\n");
         }
@@ -86,13 +85,18 @@ public class Board {
     public void hit(Position position) {
         if (isShip(position)) {
             board[position.getX()][position.getY()] = "X";
+            board2[position.getX()][position.getY()] = "X";
             return;
         }
         board[position.getX()][position.getY()] = ".";
+        board2[position.getX()][position.getY()] = ".";
+
     }
 
     private boolean isShip(Position position) {
-        if (board[position.getX()][position.getY()].equals("#")) return true;
+        if (board[position.getX()][position.getY()].equals("#") || board2[position.getX()][position.getY()].equals("#") ) {
+            return true;
+        }
         return false;
     }
 

@@ -30,16 +30,18 @@ public class AttackHandler implements CommandHandler{
         for each player from the playerList saved in the GameServer,
         check if the attacker player name is different from the defender player name
         if it is:
-            attacks player2 board on the position provided;
-            updates defender board (changes "~" to "." or "x" depending on if it was water or a boat)
+            attacks player2 board on the position provided; (first line of if condition)
+            updates defender board (changes "~" to "." or "x" depending on if it was water or a ship) (second line of if condition)
 
          */
 
         for (GameServer.PlayerHandler player2 : server.getPlayerList()) {
             if (!player.getName().equals(player2.getName())) {
-                player2.getPlayerBoard().hit(hitPosition);
-                player2.send(player2.getPlayerBoard().getBoard());
-                player2.send(player2.getPlayerBoard().getAdversaryBoard());
+                player2.getPlayerBoard().hit(hitPosition); // player2 gets hit by player1
+
+                player2.send(player2.getPlayerBoard().getBoard()); // player2 updates board
+                player2.send(player.getPlayerBoard().getAdversaryBoard()); // player2 updates adversary board
+                player.send(player2.getPlayerBoard().getAdversaryBoard());
             }
         }
 
