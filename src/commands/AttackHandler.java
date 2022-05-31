@@ -9,7 +9,7 @@ public class AttackHandler implements CommandHandler{
         String[] coordinates = player.getMessage().split(" ");
 
         // verificar se o que o player escreveu são coordenadas (integers)
-        if (!(isInt(coordinates[1]) && isInt(coordinates[2]))){
+        if (!isInt(coordinates[1]) && !isInt(coordinates[2])){
             return;
         }
         Position hitPosition = new Position(Integer.parseInt(coordinates[1]), Integer.parseInt(coordinates[2]));
