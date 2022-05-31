@@ -65,8 +65,12 @@ public class GameServer {
         System.out.println(player.getName() + " joined the game!");
     }
 
+    public List<PlayerHandler> getPlayerList() {
+        return playerList;
+    }
+
     // Objecto que guarda informação do cliente (Nome, Socket, etc)
-   public class PlayerHandler implements Runnable {
+    public class PlayerHandler implements Runnable {
         private String name;
         private Board board;
         private Socket playerSocket;
@@ -150,6 +154,10 @@ public class GameServer {
 
         public Socket getPlayerSocket() {
             return playerSocket;
+        }
+
+        public Board getBoard() {
+            return board;
         }
     }
 }
