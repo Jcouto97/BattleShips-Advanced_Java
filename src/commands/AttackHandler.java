@@ -3,14 +3,18 @@ package commands;
 import field.Position;
 import network.GameServer;
 
-public class AttackHandler implements CommandHandler{
+public class AttackHandler implements CommandHandler {
+
+    /*ASDASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS*/
+    //testing
+
     @Override
     public void command(GameServer.PlayerHandler player, GameServer server) {
         // divide message sent by the player into an array, to get attack coordinates after
         String[] coordinates = player.getMessage().split(" ");
 
         // check if what the player wrote were integers
-        if (!isInt(coordinates[1]) && !isInt(coordinates[2])){
+        if (!isInt(coordinates[1]) && !isInt(coordinates[2])) {
             return;
         }
 
@@ -26,21 +30,27 @@ public class AttackHandler implements CommandHandler{
         for each player from the playerList saved in the GameServer,
         check if the attacker player name is different from the defender player name
         if it is:
-            attacks player2 board on the position provided;
-            updates defender board (changes "~" to "." or "x" depending on if it was water or a boat)
+            attacks player2 board on the position provided; (first line of if condition)
+            updates defender board (changes "~" to "." or "x" depending on if it was water or a ship) (second line of if condition)
 
          */
 
         for (GameServer.PlayerHandler player2 : server.getPlayerList()) {
             if (!player.getName().equals(player2.getName())) {
-                player2.getPlayerBoard().hit(hitPosition);
-                player2.send(player2.getPlayerBoard().getBoard());
+                String hit = player2.getPlayerBoard().hit(hitPosition); // player2 gets hit by player1
+                player.getPlayerBoard().updateAdversaryBoard(hitPosition, hit);
+
+                player2.send(player2.getPlayerBoard().getYourBoard());// player2 prints his board in console
+                player2.send(player2.getPlayerBoard().getAdversaryBoard()); // player2 prints adversary(player1) board in console
+
+                /*player.send(player.getPlayerBoard().getBoard()); // player1 prints his board in console
+                player.send(player2.getPlayerBoard().getAdversaryBoard());*/ // player1 prints adversary(player2) board in console
             }
         }
 
     }
 
-    public boolean isInt(String coordinate){
+    public boolean isInt(String coordinate) {
         try {
             Integer.parseInt(coordinate);
             return true;

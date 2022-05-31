@@ -92,13 +92,15 @@ public class GameServer {
         public void run() {
             while (!playerSocket.isClosed()) {
                 try {
-                    send(board.getBoard());
+                    send(board.getYourBoard());
+                    send(board.getAdversaryBoard());
                     this.message = reader.readLine();//o que vem do player //blocking method
                     if(isCommand(message)){
                         dealWithCommand(message);
                         send(message);
+                    } else if (!isCommand(message)) {
+                        send("Not a command, try again!");
                     }
-                    send("Not a command, try again!");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
