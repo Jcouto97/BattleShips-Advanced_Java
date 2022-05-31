@@ -1,6 +1,7 @@
 package field;
 
 import gameobjects.Ship;
+
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
 
@@ -17,16 +18,16 @@ public class Board {
     private void drawNumbersAndWater(int numberOfRows, int numberOfCols) {
         for (int rows = 0; rows < this.board.length; rows++) {
             for (int cols = 0; cols < this.board[rows].length; cols++) {
-                if(rows==0 && cols == 0){
+                if (rows == 0 && cols == 0) {
                     this.board[rows][cols] = " ";
                     continue;
                 }
-                if(rows == 0){
+                if (rows == 0) {
                     this.board[rows][cols] = String.valueOf(numberOfRows);
                     numberOfRows++;
                     continue;
                 }
-                if(cols == 0){
+                if (cols == 0) {
                     this.board[rows][cols] = String.valueOf(numberOfCols);
                     numberOfCols++;
                     continue;
@@ -37,14 +38,15 @@ public class Board {
     }
 
     // NUNO
-    public void addShip(){
-        Ship ship = new Ship(1,new Position((int) Math.floor(Math.random()*5)+1,(int) Math.floor(Math.random()*5)+1));
+    public void addShip() {
+        Ship ship = new Ship(1,new Position(3,5));
+      //  new Position((int) Math.floor(Math.random() * 5) + 1, (int) Math.floor(Math.random() * 5) + 1));
         this.board[ship.getPosition().getX()][ship.getPosition().getY()] = "#";
     }
 
     // get the full board
     public String getBoard() {
-        String board="";
+        String board = "";
         for (String[] rows : this.board) {
             for (String cols : rows) {
                 board = board.concat(" " + cols + " ");
@@ -54,4 +56,18 @@ public class Board {
         return board;
     }
 
+    public void hit(Position position) {
+        if (isShip(position)) {
+            board[position.getX()][position.getY()] = "X";
+            return;
+        }
+        board[position.getX()][position.getY()] = ".";
+    }
+
+    private boolean isShip(Position position) {
+        if (board[position.getX()][position.getY()].equals("#")) return true;
+        return false;
+    }
+
 }
+

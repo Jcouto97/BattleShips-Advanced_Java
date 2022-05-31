@@ -15,6 +15,9 @@ public enum Command {
     }
 
     public static Command getCommandFromDescription(String description) {
+        for (int i = 0; i < Command.values().length; i++) {
+            if(Command.values()[i].description.equals(description))return Command.values()[i];
+        }
         return null;
     }
 
