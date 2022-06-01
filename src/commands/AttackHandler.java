@@ -62,6 +62,8 @@ public class AttackHandler implements CommandHandler {
                     defender.setLoser();
                     defender.send("You Lost");
                     attacker.send("You Win");
+                    defender.close();
+                    attacker.close();
                 }
             }
         }
