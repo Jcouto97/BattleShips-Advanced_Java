@@ -4,6 +4,7 @@ import gameobjects.Ship;
 import gameobjects.ShipsENUM;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -21,6 +22,8 @@ public class Board {
 
     private final int[] allShipSizes;
     private List<Ship> allTheShips;
+
+    private final HashSet<Position> listOfPreviousAttacks = new HashSet<Position>();
 
 
     /*
@@ -109,7 +112,7 @@ public class Board {
     // # = ship
     private void drawShipOnBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
-            this.yourBoard[ship.getFullShip().get(i).getX()] [ship.getFullShip().get(i).getY()] = "#";
+            this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = "#";
         }
     }
 
@@ -148,7 +151,8 @@ public class Board {
         }
         return false;
     }
-//check if the new ship created is connected to the other ships
+
+    //check if the new ship created is connected to the other ships
     private boolean checkIfShipsConnected(Ship ship, int newShipPositions, int indexOfAllShips, int shipPositions) {
         for (int indexShipEnum = 0; indexShipEnum < ShipsENUM.values().length; indexShipEnum++) {
             if (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).getX() == (ship.getFullShip()
@@ -187,12 +191,21 @@ public class Board {
         }
         return newBoardString;
     }
-// updating enemy board from the attacker
-public void updateAdversaryBoard(Position position,String hit){
-    enemyBoard[position.getX()][position.getY()] = hit;
-}
-//update the defender board
+
+    // updating enemy board from the attacker
+    public void updateAdversaryBoard(Position position, String hit) {
+        enemyBoard[position.getX()][position.getY()] = hit;
+    }
+
+    //update the defender board
     public String hit(Position position) {
+        for (Position i : listOfPreviousAttacks) {
+            if (i.getX() == position.getX() && i.getY() == position.getY()) {
+                return "Same position";
+            }
+        }
+        listOfPreviousAttacks.add(position);
+
         if (isShip(position)) {
             yourBoard[position.getX()][position.getY()] = "X";
             return "X";
