@@ -6,7 +6,6 @@ public enum Command {
     RANDOM ("/random", new RandomHandler()),
     READY ("/ready", new ReadyHandler());
 
-
     private String description;
     private CommandHandler handler;
 
@@ -17,7 +16,6 @@ public enum Command {
         this.description = description;
         this.handler = handler;
     }
-
 
     /*
     Gets a command from the description given

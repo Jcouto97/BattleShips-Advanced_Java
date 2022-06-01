@@ -17,6 +17,12 @@ Creates an array with all the sizes of the ships in ascendent order
 */
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
+    private final static String EMPTY_SPACE = " ";
+    private final static String WATER = "~";
+    private final static String BOAT_PIECE = "#";
+    private final static String BOAT_PIECE_HIT = "X";
+    private final static String WATER_HIT = ".";
+
 
     private final String[][] yourBoard;
     private final String[][] enemyBoard;
@@ -65,7 +71,7 @@ public class Board {
         for (int rows = 0; rows < this.yourBoard.length; rows++) {
             for (int cols = 0; cols < this.yourBoard[rows].length; cols++) {
                 if (rows == 0 && cols == 0) {
-                    this.yourBoard[rows][cols] = " ";
+                    this.yourBoard[rows][cols] = EMPTY_SPACE;
                     continue;
                 }
                 if (rows == 0) {
@@ -78,7 +84,7 @@ public class Board {
                     numberOfCols++;
                     continue;
                 }
-                this.yourBoard[rows][cols] = "~";
+                this.yourBoard[rows][cols] = WATER;
             }
         }
     }
@@ -115,7 +121,7 @@ public class Board {
     // # = ship
     private void drawShipOnBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
-            this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = "#";
+            this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = BOAT_PIECE;
         }
     }
 
@@ -177,7 +183,7 @@ public class Board {
         String boardString = "";
         for (String[] rows : this.yourBoard) {
             for (String cols : rows) {
-                boardString = boardString.concat(" " + cols + " ");
+                boardString = boardString.concat(EMPTY_SPACE + cols + EMPTY_SPACE);
             }
             boardString = boardString.concat("\n");
         }
@@ -188,7 +194,7 @@ public class Board {
         String newBoardString = "";
         for (String[] strings : this.enemyBoard) {
             for (String string : strings) {
-                newBoardString = newBoardString.concat(" " + string + " ");
+                newBoardString = newBoardString.concat(EMPTY_SPACE + string + EMPTY_SPACE);
             }
             newBoardString = newBoardString.concat("\n");
         }
@@ -212,15 +218,15 @@ public class Board {
         }
 
         if (isShip(position)) {
-            yourBoard[position.getX()][position.getY()] = "X";
-            return "X";
+            yourBoard[position.getX()][position.getY()] = BOAT_PIECE_HIT;
+            return BOAT_PIECE_HIT;
         }
-        yourBoard[position.getX()][position.getY()] = ".";
-        return ".";
+        yourBoard[position.getX()][position.getY()] = WATER_HIT;
+        return WATER_HIT;
     }
 
     private boolean isShip(Position position) {
-        if (yourBoard[position.getX()][position.getY()].equals("#") || enemyBoard[position.getX()][position.getY()].equals("#")) {
+        if (yourBoard[position.getX()][position.getY()].equals(BOAT_PIECE) || enemyBoard[position.getX()][position.getY()].equals(BOAT_PIECE)) {
             return true;
         }
         return false;

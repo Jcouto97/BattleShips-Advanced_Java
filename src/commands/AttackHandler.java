@@ -27,18 +27,28 @@ public class AttackHandler implements CommandHandler {
 
         Position hitPosition = new Position(ColumnENUM.values()[columnEnumIndex].getValue(), Integer.parseInt(coordinates[2]));
 
-/*
+        /*
         if it is: attacks player2 board on the position provided; (first line of if condition)
             updates defender board (changes "~" to "." or "x" depending on if it was water or a ship) (second line of if condition)
          */
         for (GameServer.PlayerHandler defender : server.getPlayerList()) {
             if (!attacker.getName().equals(defender.getName())) {
                 String hit = defender.getPlayerBoard().hit(hitPosition); // defender gets hit by attacker
-                if (samePosition(attacker, hit)) break; // checks if is the same position
-                if (checkOutOfBounds(attacker, hit)) break; // check is it´s out of bounds
+                if (samePosition(attacker, hit)) {
+                    break; // checks if is the same position
+                }
+
+                if (checkOutOfBounds(attacker, hit)) {
+                    break; // check is it´s out of bounds
+                }
+
                 attacker.getPlayerBoard().updateAdversaryBoard(hitPosition, hit); //Update the attackers enemy board;
                 reDrawDefenderBoards(defender); //Redraws both of the defender boards (attacker and defender);
-                if (checkIfMissShip(attacker, defender, hit)) break; // check if missed ship
+
+                if (checkIfMissShip(attacker, defender, hit)) {
+                    break; // check if missed ship
+                }
+
                 shipHit(hitPosition, defender); // hit the ship and reduces its life
                 winnerAndLoser(attacker, defender); // check if there is a winner
             }
@@ -52,7 +62,7 @@ public class AttackHandler implements CommandHandler {
 
     /*
     Checks if is the same position
-     */
+    */
     private boolean samePosition(GameServer.PlayerHandler attacker, String hit) {
         if (hit.equals("Same position")) {
             attacker.send("You already attacked in those coordinates, try again!");
@@ -60,6 +70,7 @@ public class AttackHandler implements CommandHandler {
         }
         return false;
     }
+
     /*
     Check is it´s out of bounds
      */
@@ -92,11 +103,11 @@ public class AttackHandler implements CommandHandler {
     }
 
 
-/*
- Hit the ship and reduces its life
- 1º For, iterates thru array of ships;
- 2º For, iterates thru the ship positions;
- */
+    /*
+     Hit the ship and reduces its life
+     1º For, iterates through array of ships;
+     2º For, iterates through the ship positions;
+     */
     private void shipHit(Position hitPosition, GameServer.PlayerHandler defender) {
         for (int i = 0; i < defender.getPlayerBoard().getAllTheShips().size(); i++) { //inside the array of ships
             for (int j = 0; j < defender.getPlayerBoard().getAllTheShips().get(i).getFullShip().size(); j++) { //inside the ship
