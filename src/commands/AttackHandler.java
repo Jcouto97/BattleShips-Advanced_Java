@@ -37,11 +37,11 @@ public class AttackHandler implements CommandHandler {
             if (!attacker.getName().equals(defender.getName())) {
                 String hit = defender.getPlayerBoard().hit(hitPosition); // defender gets hit by attacker
                 if (hit.equals("Same position")) {
-                    attacker.send("You already chose those coordinates, try again!");
+                    attacker.send("You already attacked in those coordinates, try again!");
                     break;
                 }
                 if (hit.equals("Out of bounds")){
-                    attacker.send("Those coordinates are outside the board, try again!");
+                    attacker.send("Coordinates are outside the board, try again!");
                     break;
                 }
                 attacker.getPlayerBoard().updateAdversaryBoard(hitPosition, hit); //Update the attackers enemy board;
