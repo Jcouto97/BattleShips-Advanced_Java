@@ -15,5 +15,6 @@ public class RandomHandler implements CommandHandler{
         player.setBoard(null);
         Board newBoard = new Board();
         player.setBoard(newBoard);
+        player.setMaxNumberOfRandomBoards(player.getMaxNumberOfRandomBoards() - 1);
     }
 }

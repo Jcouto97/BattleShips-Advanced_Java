@@ -124,6 +124,7 @@ public class GameServer {
         private final Object lock;
         private boolean loser;
         private boolean ready;
+        private int maxNumberOfRandomBoards;
 
         /*
         Constructor that receives a name and a playerSocket
@@ -145,6 +146,7 @@ public class GameServer {
             this.loser = false;
             this.lock = new Object();
             this.ready = false;
+            this.maxNumberOfRandomBoards = 3;
         }
 
         /*
@@ -183,9 +185,9 @@ public class GameServer {
             while (!ready) {
                 try {
                     send(board.getYourBoard()); //mostra primeiro a board e depois se queres ready ou random
-                    send("Write /ready to start the game!\nWrite /random for a new board!");
+                    send("Write /ready to start the game!\nWrite /random for a new board!\nNumber of random boards you can still generate: " + this.maxNumberOfRandomBoards);
                     this.message = reader.readLine();
-                    if (isCommand(message)) {
+                    if (isCommand(message) && this.maxNumberOfRandomBoards != 0) {
                         dealWithCommand(message);
                     }
                 } catch (IOException e) {
@@ -291,6 +293,14 @@ public class GameServer {
 
         public void setBoard(Board board) {
             this.board = board;
+        }
+
+        public int getMaxNumberOfRandomBoards() {
+            return maxNumberOfRandomBoards;
+        }
+
+        public void setMaxNumberOfRandomBoards(int maxNumberOfRandomBoards) {
+            this.maxNumberOfRandomBoards = maxNumberOfRandomBoards;
         }
     }
 }

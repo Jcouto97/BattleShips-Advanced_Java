@@ -1,10 +1,8 @@
 package gameobjects;
 
 import field.Position;
-
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class Ship {
     private final int OFFSET = 4;
