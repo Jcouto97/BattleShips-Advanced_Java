@@ -86,7 +86,7 @@ public class GameServer {
      */
     public class PlayerHandler implements Runnable {
         private final String name;
-        private final Board board;
+        private Board board;
         private final Socket playerSocket;
         private final BufferedWriter writer;
         private final BufferedReader reader;
@@ -136,9 +136,10 @@ public class GameServer {
         public void run() {
             //ready
             //notifyAll
-
+            //RANDOMIZE
             while (!ready) {
                 try {
+                    send(board.getYourBoard());
                     this.message = reader.readLine();
                     if (isCommand(message)) {
                         dealWithCommand(message);
@@ -149,6 +150,7 @@ public class GameServer {
                 }
             }
             inc++;
+//            dealWithCommand(message);
             playersReady();
             while (!playerSocket.isClosed()) {
                 try {
@@ -254,6 +256,10 @@ public class GameServer {
 
         public void setReady(boolean ready) {
             this.ready = ready;
+        }
+
+        public void setBoard(Board board) {
+            this.board = board;
         }
     }
 }
