@@ -52,12 +52,11 @@ public class GameServer {
                     playerHandler.lock.notifyAll();
                 }
             }
-
             return;
         }
         synchronized (lock2){
             try {
-                player.send("waiting for openent to connect");
+                player.send("Waiting for adversary to attack!");
                 lock2.wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -73,7 +72,7 @@ public class GameServer {
     public void acceptConnection(int numberOfConnections) {
         try {
             Socket playerSocket = serverSocket.accept();
-            addPlayer(new PlayerHandler("Player -".concat(String.valueOf(numberOfConnections)), playerSocket));
+            addPlayer(new PlayerHandler("Player-".concat(String.valueOf(numberOfConnections)), playerSocket));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -82,7 +81,7 @@ public class GameServer {
     /*
     The new PlayerHandler instance will be added to the player list;
     It's runnable will be submitted to the thread pool
-     */
+    */
     public void addPlayer(PlayerHandler player) {
         playerList.add(player);
         service.submit(player);
@@ -141,21 +140,19 @@ public class GameServer {
         }
 
         /*
-                        Thread that reads what players messages
-                        Shows players boards
-                        Deals with commands
-                         */
+        Thread that reads players messages
+        Shows players boards
+        Deals with commands
+        */
         @Override
         public void run() {
             //ready
             //notifyAll
-
             while (!ready) {
                 try {
                     this.message = reader.readLine();
                     if (isCommand(message)) {
                         dealWithCommand(message);
-                        //dealWithReady();
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -192,7 +189,7 @@ public class GameServer {
 
         /*
         Verifies if message is a command
-         */
+        */
         public boolean isCommand(String message) {
             return message.startsWith("/");
         }
@@ -209,15 +206,6 @@ public class GameServer {
 
             command.getHandler().command(this, GameServer.this);  //executar o comando
         }
-
-//        public void dealWithReady() {
-//            String ready = "/ready";
-//            Command command = Command.getCommandFromDescription(ready);
-//
-//            if (command == null) return;
-//
-//            command.getHandler().command(this, GameServer.this);
-//        }
 
         /*
         Deals with buffers
