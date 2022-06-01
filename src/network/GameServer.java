@@ -160,6 +160,7 @@ public class GameServer {
             while (!ready) {
                 try {
                     send(board.getYourBoard());
+                    send("Write /ready to start the game!\nWrite /random for a new board!");
                     this.message = reader.readLine();
                     if (isCommand(message)) {
                         dealWithCommand(message);
@@ -181,7 +182,7 @@ public class GameServer {
                             lock.wait();
                         }
                     }
-                    send("You are attacking!");
+                    send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: '3 4'");
 
                     this.message = reader.readLine();//o que vem do player //blocking method
                     if (isCommand(message)) {
