@@ -93,6 +93,7 @@ public class GameServer {
         private String message;
         private boolean isAttacker;
         private final Object lock = new Object();
+        private boolean loser;
         private boolean ready = false;
 
         public PlayerHandler(String name, Socket playerSocket) throws IOException {
@@ -102,6 +103,20 @@ public class GameServer {
             this.writer = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
             this.reader = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
             this.isAttacker = false;
+            this.loser = false;
+        }
+
+        public boolean checkIfTheresShipsAlive() {
+            for (int i = 0; i < board.getAllTheShips().size(); i++) {
+                if (!board.getAllTheShips().get(i).isDead()) {
+                 return true;
+                }
+            }
+            return false;
+        }
+
+        public void setLoser() {
+            this.loser = true;
         }
 
         public boolean isAttacker() {
@@ -174,7 +189,6 @@ public class GameServer {
         public void dealWithCommand(String message) {
             String[] words = message.split(" ", 2);
             Command command = Command.getCommandFromDescription(words[0]); //para ter o /attack
-
 
             if (command == null) return;  //volta para o run
 
