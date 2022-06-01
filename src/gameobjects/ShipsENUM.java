@@ -14,9 +14,9 @@ public enum ShipsENUM {
     SHIP_BOT_LEFT(-1,-1),
     SHIP_BOT_RIGHT(1,-1);
 
-/*
-Coordinates
- */
+    /*
+    Coordinates
+    */
     private final int AxisX;
     private final int AxisY;
 
