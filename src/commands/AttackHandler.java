@@ -1,5 +1,6 @@
 package commands;
 
+import field.ColumnENUM;
 import field.Position;
 import network.GameServer;
 
@@ -19,12 +20,12 @@ public class AttackHandler implements CommandHandler {
     @Override
     public void command(GameServer.PlayerHandler attacker, GameServer server) {
         String[] coordinates = attacker.getMessage().split(" ");
-
-        if (!isInt(coordinates[1]) || !isInt(coordinates[2])) {
+        int columnEnumIndex = isEnum(coordinates[1].toUpperCase());
+        if (columnEnumIndex == -1 || !isInt(coordinates[2])) {
             return;
         }
 
-        Position hitPosition = new Position(Integer.parseInt(coordinates[1]), Integer.parseInt(coordinates[2]));
+        Position hitPosition = new Position(ColumnENUM.values()[columnEnumIndex].getValue(), Integer.parseInt(coordinates[2]));
 
 /*
         if it is:
@@ -102,5 +103,14 @@ public class AttackHandler implements CommandHandler {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public int isEnum(String letter) {
+        for (int i = 0; i < ColumnENUM.values().length; i++) {
+            if (letter.equals(ColumnENUM.values()[i].getLetter())) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

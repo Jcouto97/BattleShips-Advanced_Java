@@ -25,6 +25,7 @@ public class Board {
     private List<Ship> allTheShips;
 
     private final Set<Position> listOfPreviousAttacks = new HashSet<>();
+    private final ColumnENUM[] columnENUM;
 
 
     /*
@@ -42,6 +43,7 @@ public class Board {
         drawNumbersAndWater(numberOfRows, numberOfCols);
         cloneBoard();
         addShip();
+        columnENUM = ColumnENUM.values();
     }
 
     /*
@@ -72,7 +74,7 @@ public class Board {
                     continue;
                 }
                 if (cols == 0) {
-                    this.yourBoard[rows][cols] = String.valueOf(numberOfCols);
+                    this.yourBoard[rows][cols] = ColumnENUM.values()[numberOfCols].getLetter();
                     numberOfCols++;
                     continue;
                 }

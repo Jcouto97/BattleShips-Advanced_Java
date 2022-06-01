@@ -89,7 +89,7 @@ public class GameServer {
     /*
     The new PlayerHandler instance will be added to the player list;
     It's runnable will be submitted to the thread pool
-     */
+    */
     public void addPlayer(PlayerHandler player) {
         playerList.add(player);
         service.submit(player);
@@ -182,7 +182,7 @@ public class GameServer {
                             lock.wait();
                         }
                     }
-                    send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: '3 4'");
+                    send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
 
                     this.message = reader.readLine();//o que vem do player //blocking method
                     if (isCommand(message)) {
@@ -198,7 +198,7 @@ public class GameServer {
 
         /*
         Verifies if message is a command
-         */
+        */
         public boolean isCommand(String message) {
             return message.startsWith("/");
         }
