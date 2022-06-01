@@ -53,7 +53,7 @@ public class GameServer {
             }
             return;
         }
-        synchronized (lock2){
+        synchronized (lock2) {
             try {
                 player.send("Waiting for adversary to connect!");
                 lock2.wait();
@@ -62,14 +62,16 @@ public class GameServer {
             }
         }
     }
-public void removePlayers(String name){
-    for (int i = 0; i < playerList.size(); i++) {
-        if(playerList.get(i).name.equals(name)){
-            playerList.remove(i);
-            return;
+
+    public void removePlayers(String name) {
+        for (int i = 0; i < playerList.size(); i++) {
+            if (playerList.get(i).name.equals(name)) {
+                playerList.remove(i);
+                return;
+            }
         }
     }
-}
+
     /*
     Server socket accepts the players socket;
     Created new Player with name (using numOfConnections) and his socket;
@@ -127,7 +129,7 @@ public void removePlayers(String name){
         public boolean checkIfTheresShipsAlive() {
             for (int i = 0; i < board.getAllTheShips().size(); i++) {
                 if (!board.getAllTheShips().get(i).isDead()) {
-                 return true;
+                    return true;
                 }
             }
             return false;
