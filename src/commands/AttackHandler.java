@@ -52,12 +52,39 @@ public class AttackHandler implements CommandHandler {
                 if (!hit.equals("X")) {
                     attacker.setAttacker(false);
                     defender.setAttacker(true);
+                    break;
+                }
+
+                shipHit(hitPosition, defender);
+
+
+                if (!defender.checkIfTheresShipsAlive()) {
+                    defender.setLoser();
+                    defender.send("You Lost");
+                    attacker.send("You Win");
                 }
             }
         }
+
         for (GameServer.PlayerHandler players : server.getPlayerList()) {
             synchronized (players.getLock()) {
                 players.getLock().notifyAll();
+            }
+        }
+    }
+
+    private void shipHit(Position hitPosition, GameServer.PlayerHandler defender) {
+        for (int i = 0; i < defender.getPlayerBoard().getAllTheShips().size(); i++) {
+            for (int j = 0; j < defender.getPlayerBoard().getAllTheShips().get(i).getFullShip().size(); j++) {
+                if (defender.getPlayerBoard().getAllTheShips().get(i).getFullShip().get(j).equals(hitPosition)) {
+                    defender.getPlayerBoard().getAllTheShips().get(i).shipHit();
+
+                    if (defender.getPlayerBoard().getAllTheShips().get(i).getNumberOfHits() == 0) {
+                        defender.getPlayerBoard().getAllTheShips().get(i).setDead();
+                    }
+
+                    return;
+                }
             }
         }
     }
