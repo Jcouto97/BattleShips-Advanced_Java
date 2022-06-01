@@ -204,6 +204,10 @@ public class Board {
                 return "Same position";
             }
         }
+
+        if (position.getX() <= 0 || position.getY() <= 0 || position.getX() >= BOARD_MAX_SIZE - 1 || position.getY() < BOARD_MAX_SIZE - 1) {
+            return "Out of bounds";
+        }
         listOfPreviousAttacks.add(position);
 
         if (isShip(position)) {

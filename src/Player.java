@@ -37,7 +37,6 @@ public class Player {
 
         public KeyboardHandler(Socket socket) {
             try {
-                System.out.println("Enter the coordinates:");
                 this.reader = new BufferedReader(new InputStreamReader(System.in));
                 this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 this.consoleReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
