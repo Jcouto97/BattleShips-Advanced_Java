@@ -36,6 +36,10 @@ public class AttackHandler implements CommandHandler {
         for (GameServer.PlayerHandler defender : server.getPlayerList()) {
             if (!attacker.getName().equals(defender.getName())) {
                 String hit = defender.getPlayerBoard().hit(hitPosition); // defender gets hit by attacker
+                if (hit.equals("Same position")) {
+                    attacker.send("You already attacked those coordinates. Type another:");
+                    break;
+                }
                 attacker.getPlayerBoard().updateAdversaryBoard(hitPosition, hit); //Update the attackers enemy board;
 
                 //Redraws both of the defender boards (attacker and defender);
