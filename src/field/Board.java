@@ -33,7 +33,7 @@ public class Board {
     Adds ships to attackers board ,
     */
     public Board() {
-        allShipSizes = new int[]{2,3, 3, 4, 5};
+        allShipSizes = new int[]{2, 3, 3, 4, 5};
         allTheShips = new ArrayList<>();
         this.yourBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
         this.enemyBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];

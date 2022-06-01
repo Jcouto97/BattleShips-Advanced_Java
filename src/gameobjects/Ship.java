@@ -46,6 +46,7 @@ public class Ship {
     public void shipHit() {
         numberOfHits--;
     }
+
     public void setDead() {
         isDead = true;
     }

@@ -157,9 +157,9 @@ public class GameServer {
 
                     while (!isAttacker) {
                         synchronized (lock) {
-                            send("waiting for attacker!");
                             lock.wait();
                         }
+                        send("Waiting for adversary attack!");
                     }
                     send("You are attacking!");
 
