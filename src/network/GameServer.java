@@ -23,6 +23,7 @@ public class GameServer {
     Starts a new list were players will be added;
     Adds number of connections of players to the server;
      */
+
     public void start(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
@@ -37,13 +38,11 @@ public class GameServer {
             ++numberOfConnections;
             acceptConnection(numberOfConnections);
             if (numberOfConnections == 2) {
-                playerList.get((int) Math.floor(Math.random()*2)).isAttacker = true;
+                playerList.get((int) Math.floor(Math.random() * 2)).isAttacker = true;
                 for (PlayerHandler playerHandler : playerList) {
                     synchronized (playerHandler.lock) {
                         playerHandler.lock.notifyAll();
                     }
-
-
                 }
             }
         }
@@ -90,6 +89,7 @@ public class GameServer {
         private String message;
         private boolean isAttacker;
         private final Object lock = new Object();
+        private boolean loser;
 
         public PlayerHandler(String name, Socket playerSocket) throws IOException {
             this.name = name;
@@ -98,6 +98,20 @@ public class GameServer {
             this.writer = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
             this.reader = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
             this.isAttacker = false;
+            this.loser = false;
+        }
+
+        public boolean checkIfTheresShipsAlive() {
+            for (int i = 0; i < board.getAllTheShips().size(); i++) {
+                if (!board.getAllTheShips().get(i).isDead()) {
+                 return true;
+                }
+            }
+            return false;
+        }
+
+        public void setLoser() {
+            this.loser = true;
         }
 
         public boolean isAttacker() {
