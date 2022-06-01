@@ -136,11 +136,13 @@ public class GameServer {
         public void run() {
             //ready
             //notifyAll
+
             while (!ready) {
                 try {
                     this.message = reader.readLine();
                     if (isCommand(message)) {
-                        dealWithReady();
+                        dealWithCommand(message);
+                        //dealWithReady();
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -195,14 +197,14 @@ public class GameServer {
             command.getHandler().command(this, GameServer.this);  //executar o comando
         }
 
-        public void dealWithReady() {
-            String ready = "/ready";
-            Command command = Command.getCommandFromDescription(ready);
-
-            if (command == null) return;
-
-            command.getHandler().command(this, GameServer.this);
-        }
+//        public void dealWithReady() {
+//            String ready = "/ready";
+//            Command command = Command.getCommandFromDescription(ready);
+//
+//            if (command == null) return;
+//
+//            command.getHandler().command(this, GameServer.this);
+//        }
 
         /*
         Deals with buffers

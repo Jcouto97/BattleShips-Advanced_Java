@@ -51,6 +51,7 @@ public class Player {
         @Override
         public void run() {
             //Read Thread
+            System.out.println("Write /ready to start the game!");
             new Thread(() -> {
                 while(!keyboardSocket.isClosed()) { // loop para estar sempre a fazer o readLine (lê o input do player)
                     try {
