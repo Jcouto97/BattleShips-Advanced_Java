@@ -1,6 +1,7 @@
 package network;
 
 import commands.Command;
+import commands.ReadyHandler;
 import field.Board;
 
 import java.io.*;
@@ -36,15 +37,17 @@ public class GameServer {
         while (true) {
             ++numberOfConnections;
             acceptConnection(numberOfConnections);
-            if (numberOfConnections == 2) {
-                playerList.get((int) Math.floor(Math.random()*2)).isAttacker = true;
-                for (PlayerHandler playerHandler : playerList) {
-                    synchronized (playerHandler.lock) {
-                        playerHandler.lock.notifyAll();
-                    }
+        }
+    }
 
-
+    private synchronized void playersReady() {
+        if (inc == 2) {
+            playerList.get((int) Math.floor(Math.random() * 2)).isAttacker = true;
+            for (PlayerHandler playerHandler : playerList) {
+                synchronized (playerHandler.lock) {
+                    playerHandler.lock.notifyAll();
                 }
+
             }
         }
     }
@@ -90,6 +93,7 @@ public class GameServer {
         private String message;
         private boolean isAttacker;
         private final Object lock = new Object();
+        private boolean ready = false;
 
         public PlayerHandler(String name, Socket playerSocket) throws IOException {
             this.name = name;
@@ -115,6 +119,20 @@ public class GameServer {
                          */
         @Override
         public void run() {
+            //ready
+            //notifyAll
+            while (!ready) {
+                try {
+                    this.message = reader.readLine();
+                    if (isCommand(message)) {
+                        dealWithReady();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            inc++;
+            playersReady();
             while (!playerSocket.isClosed()) {
                 try {
                     send(board.getYourBoard());
@@ -157,11 +175,20 @@ public class GameServer {
             String[] words = message.split(" ", 2);
             Command command = Command.getCommandFromDescription(words[0]); //para ter o /attack
 
+
             if (command == null) return;  //volta para o run
 
             command.getHandler().command(this, GameServer.this);  //executar o comando
         }
 
+        public void dealWithReady() {
+            String ready = "/ready";
+            Command command = Command.getCommandFromDescription(ready);
+
+            if (command == null) return;
+
+            command.getHandler().command(this, GameServer.this);
+        }
 
         /*
         Deals with buffers
@@ -207,6 +234,10 @@ public class GameServer {
 
         public Board getPlayerBoard() {
             return board;
+        }
+
+        public void setReady(boolean ready) {
+            this.ready = ready;
         }
     }
 }
