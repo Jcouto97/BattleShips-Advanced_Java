@@ -17,6 +17,7 @@ public class GameServer {
     private ExecutorService service;
     private List<PlayerHandler> playerList;
     private int inc = 0;
+    private final Object lock2 = new Object();
 
     /*
     Starts server with port as a parameter;
@@ -40,14 +41,26 @@ public class GameServer {
         }
     }
 
-    private synchronized void playersReady() {
+    private void playersReady(PlayerHandler player) {
         if (inc == 2) {
+            synchronized (lock2) {
+                lock2.notifyAll();
+            }
             playerList.get((int) Math.floor(Math.random() * 2)).isAttacker = true;
             for (PlayerHandler playerHandler : playerList) {
                 synchronized (playerHandler.lock) {
                     playerHandler.lock.notifyAll();
                 }
+            }
 
+            return;
+        }
+        synchronized (lock2){
+            try {
+                player.send("waiting for openent to connect");
+                lock2.wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -149,7 +162,7 @@ public class GameServer {
                 }
             }
             inc++;
-            playersReady();
+            playersReady(this);
             while (!playerSocket.isClosed()) {
                 try {
                     send(board.getYourBoard());
@@ -157,9 +170,9 @@ public class GameServer {
 
                     while (!isAttacker) {
                         synchronized (lock) {
+                            send("Waiting for adversary attack!");
                             lock.wait();
                         }
-                        send("Waiting for adversary attack!");
                     }
                     send("You are attacking!");
 
