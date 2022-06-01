@@ -1,7 +1,6 @@
 package network;
 
 import commands.Command;
-import commands.ReadyHandler;
 import field.Board;
 
 import java.io.*;
@@ -17,6 +16,7 @@ public class GameServer {
     private ExecutorService service;
     private List<PlayerHandler> playerList;
     private int inc = 0;
+    private final Object lock2 = new Object();
 
     /*
     Starts server with port as a parameter;
@@ -40,18 +40,36 @@ public class GameServer {
         }
     }
 
-    private synchronized void playersReady() {
+    private void playersReady(PlayerHandler player) {
         if (inc == 2) {
+            synchronized (lock2) {
+                lock2.notifyAll();
+            }
             playerList.get((int) Math.floor(Math.random() * 2)).isAttacker = true;
             for (PlayerHandler playerHandler : playerList) {
                 synchronized (playerHandler.lock) {
                     playerHandler.lock.notifyAll();
                 }
-
+            }
+            return;
+        }
+        synchronized (lock2){
+            try {
+                player.send("Waiting for adversary to connect!");
+                lock2.wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
-
+public void removePlayers(String name){
+    for (int i = 0; i < playerList.size(); i++) {
+        if(playerList.get(i).name.equals(name)){
+            playerList.remove(i);
+            return;
+        }
+    }
+}
     /*
     Server socket accepts the players socket;
     Created new Player with name (using numOfConnections) and his socket;
@@ -60,7 +78,7 @@ public class GameServer {
     public void acceptConnection(int numberOfConnections) {
         try {
             Socket playerSocket = serverSocket.accept();
-            addPlayer(new PlayerHandler("Player -".concat(String.valueOf(numberOfConnections)), playerSocket));
+            addPlayer(new PlayerHandler("Player-".concat(String.valueOf(numberOfConnections)), playerSocket));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -128,10 +146,10 @@ public class GameServer {
         }
 
         /*
-                        Thread that reads what players messages
-                        Shows players boards
-                        Deals with commands
-                         */
+        Thread that reads players messages
+        Shows players boards
+        Deals with commands
+        */
         @Override
         public void run() {
             //ready
@@ -143,15 +161,13 @@ public class GameServer {
                     this.message = reader.readLine();
                     if (isCommand(message)) {
                         dealWithCommand(message);
-                        //dealWithReady();
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
             inc++;
-//            dealWithCommand(message);
-            playersReady();
+            playersReady(this);
             while (!playerSocket.isClosed()) {
                 try {
                     send(board.getYourBoard());
@@ -159,9 +175,9 @@ public class GameServer {
 
                     while (!isAttacker) {
                         synchronized (lock) {
+                            send("Waiting for adversary attack!");
                             lock.wait();
                         }
-                        send("Waiting for adversary attack!");
                     }
                     send("You are attacking!");
 
@@ -171,9 +187,7 @@ public class GameServer {
                     } else if (!isCommand(message)) {
                         send("Not a command, try again!");
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (InterruptedException e) {
+                } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -199,15 +213,6 @@ public class GameServer {
             command.getHandler().command(this, GameServer.this);  //executar o comando
         }
 
-//        public void dealWithReady() {
-//            String ready = "/ready";
-//            Command command = Command.getCommandFromDescription(ready);
-//
-//            if (command == null) return;
-//
-//            command.getHandler().command(this, GameServer.this);
-//        }
-
         /*
         Deals with buffers
          */
@@ -227,6 +232,7 @@ public class GameServer {
          */
         public void close() {
             try {
+                removePlayers(this.name);
                 playerSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -240,7 +246,6 @@ public class GameServer {
         public String getMessage() {
             return message;
         }
-
 
         public String getName() {
             return name;
@@ -263,4 +268,3 @@ public class GameServer {
         }
     }
 }
-
