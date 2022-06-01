@@ -6,6 +6,7 @@ import gameobjects.ShipsENUM;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /*
@@ -23,7 +24,7 @@ public class Board {
     private final int[] allShipSizes;
     private List<Ship> allTheShips;
 
-    private final HashSet<Position> listOfPreviousAttacks = new HashSet<Position>();
+    private final Set<Position> listOfPreviousAttacks = new HashSet<>();
 
 
     /*
@@ -199,16 +200,14 @@ public class Board {
 
     //update the defender board
     public String hit(Position position) {
-        for (Position i : listOfPreviousAttacks) {
-            if (i.getX() == position.getX() && i.getY() == position.getY()) {
-                return "Same position";
-            }
+
+        if(!listOfPreviousAttacks.add(position)){
+            return "Same position";
         }
 
-        if (position.getX() <= 0 || position.getY() <= 0 || position.getX() >= BOARD_MAX_SIZE - 1 || position.getY() < BOARD_MAX_SIZE - 1) {
+        if (position.getX() <= 0 || position.getY() <= 0 || position.getX() > (BOARD_MAX_SIZE - 1) || position.getY() > (BOARD_MAX_SIZE - 1)) {
             return "Out of bounds";
         }
-        listOfPreviousAttacks.add(position);
 
         if (isShip(position)) {
             yourBoard[position.getX()][position.getY()] = "X";
