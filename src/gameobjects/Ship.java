@@ -7,6 +7,7 @@ import java.util.List;
 
 
 public class Ship {
+    private final int OFFSET = 4;
     private int size; // size of the ship
     private Position head; //   private String axis;
     private List<Position> fullShip; // the full ship with positions
@@ -18,7 +19,8 @@ public class Ship {
     Add the head to the fullShip (empty list);
     CurrentPosition variable that will change in the for loop;
     Iterate according to the size given on the constructor and insert a new updated position to the body according to
-    the chosen enum, add position to body and update current position, repeat until size is met;
+    the chosen enum, add position to body and update current position, repeat until size is met. OFFSET used to
+    ignore the last 4 enums.
      */
 
     public Ship(int size, Position position) {
@@ -27,7 +29,7 @@ public class Ship {
         this.numberOfHits = size;
         this.isDead = false;
         this.head = position;
-        ShipsENUM shipDirection = ShipsENUM.values()[(int) Math.floor(Math.random() * (ShipsENUM.values().length - 4))];
+        ShipsENUM shipDirection = ShipsENUM.values()[(int) Math.floor(Math.random() * (ShipsENUM.values().length - OFFSET))];
         this.fullShip.add(head);
         Position currentPosition = head;
 

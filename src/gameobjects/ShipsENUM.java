@@ -2,6 +2,7 @@ package gameobjects;
 /*
 This makes the body of the ship
 Takes the Head of the ship and creates a body randomized to one the enums directions
+The last 4 to check the diagonals of the ship
  */
 
 public enum ShipsENUM {

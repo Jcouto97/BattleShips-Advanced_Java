@@ -15,7 +15,7 @@ public class GameServer {
     private ServerSocket serverSocket;
     private ExecutorService service;
     private List<PlayerHandler> playerList;
-    private int inc = 0;
+    private int increment = 0;
     private final Object lock2 = new Object();
 
     /*
@@ -40,8 +40,13 @@ public class GameServer {
         }
     }
 
-    private void playersReady(PlayerHandler player) {
-        if (inc == 2) {
+    /*
+    Randomizes witch player starts as attacker
+    If only 1 player enter it will jump to lock2.wait until 2nd player joins
+    Then it will notifyAll() threads to start game
+     */
+    private void waitingRoom(PlayerHandler player) {
+        if (increment == 2) {
             synchronized (lock2) {
                 lock2.notifyAll();
             }
@@ -63,6 +68,9 @@ public class GameServer {
         }
     }
 
+    /*
+    Function used to remove player from list when quit (command)
+     */
     public void removePlayers(String name) {
         for (int i = 0; i < playerList.size(); i++) {
             if (playerList.get(i).name.equals(name)) {
@@ -103,6 +111,7 @@ public class GameServer {
 
     /*
     Object that stores each player info
+
      */
     public class PlayerHandler implements Runnable {
         private final String name;
@@ -112,10 +121,20 @@ public class GameServer {
         private final BufferedReader reader;
         private String message;
         private boolean isAttacker;
-        private final Object lock = new Object();
+        private final Object lock;
         private boolean loser;
-        private boolean ready = false;
+        private boolean ready;
 
+        /*
+        Constructor that receives a name and a playerSocket
+        Initializes:
+        -A board
+        -BufferedWriter + Reader
+        -isAttacker (to check player that attacks)
+        -Looser (check winner)
+        -Lock (object used to synchronize and wait switch between turns
+        -Ready (to check if players are ready to start)
+         */
         public PlayerHandler(String name, Socket playerSocket) throws IOException {
             this.name = name;
             this.board = new Board();
@@ -124,8 +143,13 @@ public class GameServer {
             this.reader = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
             this.isAttacker = false;
             this.loser = false;
+            this.lock = new Object();
+            this.ready = false;
         }
 
+        /*
+        Checks if any of the player ship is alive
+         */
         public boolean checkIfTheresShipsAlive() {
             for (int i = 0; i < board.getAllTheShips().size(); i++) {
                 if (!board.getAllTheShips().get(i).isDead()) {
@@ -150,16 +174,15 @@ public class GameServer {
         /*
         Thread that reads players messages
         Shows players boards
-        Deals with commands
+        Deals with commands (Attack, ready, random, quit)
+        After first player decides to ready or random he will be sent to the wanting room to wait 2nd player
+        If not attacker, player will wait for attacker to attack (using synchronize)
         */
         @Override
         public void run() {
-            //ready
-            //notifyAll
-            //RANDOMIZE
             while (!ready) {
                 try {
-                    send(board.getYourBoard());
+                    send(board.getYourBoard()); //mostra primeiro a board e depois se queres ready ou random
                     send("Write /ready to start the game!\nWrite /random for a new board!");
                     this.message = reader.readLine();
                     if (isCommand(message)) {
@@ -169,8 +192,8 @@ public class GameServer {
                     throw new RuntimeException(e);
                 }
             }
-            inc++;
-            playersReady(this);
+            increment++;
+            waitingRoom(this); //1st player will wait for the 2nd to start the game
             while (!playerSocket.isClosed()) {
                 try {
                     send(board.getYourBoard());

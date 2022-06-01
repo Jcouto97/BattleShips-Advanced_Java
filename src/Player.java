@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 // LUIS
 public class Player {
@@ -63,7 +64,7 @@ public class Player {
                         }
                         System.out.println(message);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.exit(1); //Terminar players se server estiver terminado
                     }
                 }
                 // se não fizer isto, o próximo while não correr porque fica preso até que o user submeta algo, mesmo depois de ter saído
