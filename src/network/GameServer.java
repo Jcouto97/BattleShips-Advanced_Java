@@ -1,5 +1,6 @@
 package network;
 
+import colors.Colors;
 import commands.Command;
 import field.Board;
 import utils.LoadingAnimation;
@@ -8,6 +9,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -238,7 +240,17 @@ public class GameServer {
         Uses Ascci art from Utils class to make starting menu
          */
         private void startScreen() {
-            send(BATTLESHIP + "\n");
+            String[] a = BATTLESHIP.split("");
+            String b = "";
+            for (String s : a) {
+                if(s.equals("$")){
+                    b += Colors.BLUE+s;
+                }
+                b += Colors.YELLOW+s;
+            }
+
+
+            send(b + "\n");
             send(PLANE + "\n\n" + BOAT + "\n \n \t\t\t Press enter to start the game :)");
             try {
                 this.message = reader.readLine();
