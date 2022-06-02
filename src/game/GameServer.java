@@ -1,5 +1,6 @@
-package network;
+package game;
 
+import colors.Colors;
 import commands.Command;
 import field.Board;
 import field.ColumnENUM;
@@ -335,8 +336,19 @@ public class GameServer {
         Uses Ascci art from Utils class to make starting menu
          */
         private void startScreen() {
-            send(BATTLESHIP + "\n");
-            send(PLANE + "\n\n" + BOAT + "\n \n \t\t\t Press enter to start the game :)");
+            String[] a = BATTLESHIP.split("");
+            String b = "";
+            for (String s : a) {
+                if(s.equals("$")){
+                    b += Colors.RED+s;
+                    continue;
+                }
+                b += Colors.BLUE+s;
+            }
+
+
+            send(b + "\n" + Colors.RESET);
+            send(PLANE + "\n" + START_BUTTON);
             try {
                 this.message = reader.readLine();
             } catch (IOException e) {
@@ -372,7 +384,6 @@ public class GameServer {
                 writer.write(message);
                 writer.newLine();
                 writer.flush();
-
             } catch (IOException e) {
 
             }

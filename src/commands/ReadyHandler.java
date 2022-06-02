@@ -1,8 +1,6 @@
 package commands;
 
-import network.GameServer;
-
-import java.util.Objects;
+import game.GameServer;
 
 public class ReadyHandler implements CommandHandler {
     /*

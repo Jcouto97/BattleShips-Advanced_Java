@@ -5,7 +5,10 @@ import field.ColumnENUM;
 import field.Position;
 import gameobjects.Ship;
 import gameobjects.ShipsENUM;
-import network.GameServer;
+import game.GameServer;
+
+import static utils.asciiArt.LOSER;
+import static utils.asciiArt.WINNER;
 
 
 public class AttackHandler implements CommandHandler {
@@ -148,7 +151,9 @@ public class AttackHandler implements CommandHandler {
         if (!defender.checkIfTheresShipsAlive()) {
             defender.loser();
             reDrawPlayerBoards(attacker);
-            attacker.send("You Win");
+            defender.send("\n\n" + LOSER);
+            attacker.send("\n\n" + WINNER);
+            defender.close();
             attacker.close();
         }
     }

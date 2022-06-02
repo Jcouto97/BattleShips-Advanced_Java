@@ -1,4 +1,4 @@
-import network.GameServer;
+import game.GameServer;
 
 public class ServerLauncher {
 
