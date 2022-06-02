@@ -234,7 +234,7 @@ public class GameServer {
                         send("Not a command, try again!");
                     }
                 } catch (IOException | InterruptedException e) {
-                    loser();
+                    clientDC();
                     close();
                 }
             }
@@ -255,12 +255,23 @@ public class GameServer {
             }
         }
 
+        public void clientDC(){
+            for (PlayerHandler players : playerList) {
+                if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
+                    players.send("You Win");
+                    players.close();
+                }
+            }
+        }
+
         public void loser() {
             for (PlayerHandler players : playerList) {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
                     this.setLoser();
+                    this.send("You Lose");
                     players.send("You Win");
                     players.close();
+                    this.close();
                 }
             }
         }

@@ -157,9 +157,6 @@ public class AttackHandler implements CommandHandler {
         if (!defender.checkIfTheresShipsAlive()) {
             defender.loser();
             reDrawPlayerBoards(attacker);
-            defender.send("You Lose");
-            defender.close();
-            attacker.close();
         }
     }
 
