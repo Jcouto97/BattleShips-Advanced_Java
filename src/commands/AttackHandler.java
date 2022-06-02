@@ -8,6 +8,7 @@ import gameobjects.ShipsENUM;
 import game.GameServer;
 
 import static utils.asciiArt.LOSER;
+import static utils.asciiArt.WINNER;
 
 
 public class AttackHandler implements CommandHandler {
@@ -155,7 +156,7 @@ public class AttackHandler implements CommandHandler {
             defender.setLoser();
             reDrawPlayerBoards(attacker);
             defender.send("You Lost" + "\n\n" + LOSER);
-            attacker.send("You Win");
+            attacker.send("You Win" + "\n\n" + WINNER);
             defender.close();
             attacker.close();
         }
