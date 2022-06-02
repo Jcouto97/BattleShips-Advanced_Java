@@ -6,24 +6,22 @@ import field.Position;
 import gameobjects.Ship;
 import gameobjects.ShipsENUM;
 import game.GameServer;
-
 import static utils.asciiArt.LOSER;
 import static utils.asciiArt.WINNER;
 
 
 public class AttackHandler implements CommandHandler {
 
-    /*
-    Divide message sent by the player into an array, to get attack coordinates after;
-    Check if what the player wrote were integers;
-    Create position where player wants to attack;
-    Iterate through list of players and if name of attacker is different
-    from name of defender, attack defenders board. Else attacker would attack himself also;
-    If so, defender gets hit by attacker;
-    Update the attackers enemy board;
-    Redraws both of the defender boards (attacker and defender);
+    /**
+     * Divide message sent by the player into an array, to get attack coordinates after;
+     * Check if what the player wrote were integers;
+     * Create position where player wants to attack;
+     * Iterate through list of players and if name of attacker is different
+     * from name of defender, attack defenders board. Else attacker would attack himself also;
+     * If so, defender gets hit by attacker;
+     * Update the attackers enemy board;
+     * Redraws both of the defender boards (attacker and defender);
      */
-
     @Override
     public void command(GameServer.PlayerHandler attacker, GameServer server) {
         String[] coordinates = attacker.getMessage().split(" ");
@@ -157,9 +155,9 @@ public class AttackHandler implements CommandHandler {
         }
     }
 
-    /*
-    Convert String to int
-    If letters, returns false
+    /**
+     * Convert String to int
+     * If letters, returns false
      */
     public boolean isInt(String coordinate) {
         try {
@@ -170,6 +168,12 @@ public class AttackHandler implements CommandHandler {
         }
     }
 
+    /**
+     * Checks if letter parameter equals to a letter from ColumnEnums
+     * Returns an index to fetch letter from ColumnEnums
+     * @param letter
+     * @return
+     */
     public int isEnum(String letter) {
         for (int i = 0; i < ColumnENUM.values().length; i++) {
             if (letter.equals(ColumnENUM.values()[i].getLetter())) {
