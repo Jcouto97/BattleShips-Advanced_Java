@@ -214,11 +214,12 @@ public class GameServer {
                     while (!isAttacker) {
                         synchronized (lock) {
                             send("Waiting for adversary attack!");
-                            send(String.valueOf(loadingAnimation.animationTime(loadingAnimation, 21)));
                             lock.wait();
                         }
                     }
                     send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
+                    send(loadingAnimation.animationTime(loadingAnimation, 20));
+
 
                     this.message = reader.readLine();//o que vem do player //blocking method
                     if (isCommand(message)) {
@@ -274,7 +275,6 @@ public class GameServer {
                 writer.write(message);
                 writer.newLine();
                 writer.flush();
-
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
