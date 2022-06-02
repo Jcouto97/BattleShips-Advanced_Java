@@ -62,6 +62,7 @@ public class Board {
 
     /**
      * This method draws the attackers board rows, columns, and content in between
+     *
      * @param numberOfRows This parameter receives the max number of rows
      * @param numberOfCols This parameter receives the max number of columns
      */
@@ -117,6 +118,7 @@ public class Board {
 
     /**
      * This method draws the head of the ship on the board, and for each iteration of the loop, it sets the next ship piece on the corresponding position
+     *
      * @param ship This parameter receives a ship.
      */
     private void drawShipOnBoard(Ship ship) {
@@ -128,6 +130,7 @@ public class Board {
 
     /**
      * This method checks if a ship is inside the boards limits.
+     *
      * @param ship This parameter receives a ship.
      * @return Returns true if a boat is inside the board, and false if it is outside.
      */
@@ -150,6 +153,7 @@ public class Board {
 
     /**
      * This method checks if a ship is over another, and also if there are no ships around it by 1 position in every direction
+     *
      * @param ship This parameter receives a ship.
      * @return Returns true if all conditions check out, and false if not.
      */
@@ -175,12 +179,13 @@ public class Board {
     //check if the new ship created is connected to the other ships
 
     /**
-     * This method checks if the ship which was created is connected to other ships
-     * @param ship This parameter receives a ship.
-     * @param newShipPositions
-     * @param indexOfAllShips
-     * @param shipPositions
-     * @return
+     * This method checks if the ship which was created is connected to other ships.
+     *
+     * @param ship             This parameter receives a ship.
+     * @param newShipPositions This parameter receives an int that will be the positions where the new ship will be drawn in.
+     * @param indexOfAllShips  This parameter receives an int that will be the index of all ships in the board.
+     * @param shipPositions    This parameter receives an int that will be the positions of all ships already placed on the board.
+     * @return Returns true if there are ships connected, false if there aren't.
      */
     private boolean checkIfShipsConnected(Ship ship, int newShipPositions, int indexOfAllShips, int shipPositions) {
         for (int indexShipEnum = 0; indexShipEnum < ShipsENUM.values().length; indexShipEnum++) {
@@ -198,7 +203,11 @@ public class Board {
         return allTheShips;
     }
 
-    // get the full board
+    /**
+     * This method gets the players own board and divides every section with an empty space -> " ", while concationg it with line breaks "\n".
+     *
+     * @return Returns the board printed on the console.
+     */
     public String getYourBoard() {
         String boardString = "";
         for (String[] rows : this.yourBoard) {
@@ -210,6 +219,11 @@ public class Board {
         return boardString;
     }
 
+    /**
+     * This method gets the player's version of the adversary board and divides every section with an empty space -> " ", while concationg it with line breaks "\n".
+     *
+     * @return Returns the board printed on the console.
+     */
     public String getAdversaryBoard() {
         String newBoardString = "";
         for (String[] strings : this.enemyBoard) {
@@ -221,12 +235,22 @@ public class Board {
         return newBoardString;
     }
 
-    // updating enemy board from the attacker
+    /**
+     * This method updates the player's version of the adversary board whenever the player hit's a position. It marks the coordinates attacked.
+     *
+     * @param position This parameter is the X and Y position of where the player decides to attack.
+     * @param hit      This parameter is the character that will show on the board depending on if the player attacked a boat or water.
+     */
     public void updateAdversaryBoard(Position position, String hit) {
         enemyBoard[position.getX()][position.getY()] = hit;
     }
 
-    //update the defender board
+    /**
+     * This method attacks the player's adversary
+     *
+     * @param position This parameter is the X and Y position of where the player decides to attack.
+     * @return Returns a string, that will change how the game is played depending on what said string is.
+     */
     public String hit(Position position) {
 
         if (!listOfPreviousAttacks.add(position)) {
@@ -245,6 +269,12 @@ public class Board {
         return Colors.BLACK_BRIGHT + WATER_HIT + Colors.RESET;
     }
 
+    /**
+     * This method says wheter the position a player attacked is a boat or not.
+     *
+     * @param position This parameter is the X and Y position of where the player decides to attack.
+     * @return Returns true if the position is a ship, or false if it isn't.
+     */
     private boolean isShip(Position position) {
         if (yourBoard[position.getX()][position.getY()].equals(Colors.YELLOW + BOAT_PIECE + Colors.RESET)) {
             return true;
