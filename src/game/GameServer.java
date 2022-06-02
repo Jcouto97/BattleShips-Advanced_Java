@@ -5,6 +5,7 @@ import commands.Command;
 import field.Board;
 import field.ColumnENUM;
 import field.Position;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,12 +25,14 @@ public class GameServer {
     private boolean isWaiting;
     private final Object lock2;
     private int gameIds;
+    private Thread bot = null;
 
     public GameServer() {
         this.gameIds = 1;
         this.lock2 = new Object();
         isWaiting = false;
     }
+
     /*
         Starts server with port as a parameter;
         Starts a thread pool with unlimited thread space;
@@ -58,17 +61,27 @@ public class GameServer {
     Then it will notifyAll() threads to start game
     */
     private void waitingRoom(PlayerHandler player) {
+        if (!isWaiting) {
+            bot = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(30000);
+                        new Bot();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            });
+            bot.start();
+        }
         if (isWaiting) {
             synchronized (lock2) {
                 lock2.notifyAll();
             }
+            bot.interrupt();
             chooseAttacker();
             gameIds++;
-//            for (PlayerHandler playerHandler : playerList) {
-//                synchronized (playerHandler.lock) {
-//                    playerHandler.lock.notifyAll();
-//                }
-//            }
             return;
         }
         synchronized (lock2) {
@@ -321,12 +334,14 @@ public class GameServer {
         public void clientDC() throws ConcurrentModificationException {
             for (PlayerHandler players : playerList) {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
-                    players.send("\n\n" + WINNER);;
+                    players.send("\n\n" + WINNER);
+                    ;
                     players.winner = true;
                     players.close();
                 }
             }
         }
+
         /*
         Uses Ascci art from Utils class to make starting menu
          */
@@ -334,11 +349,11 @@ public class GameServer {
             String[] a = BATTLESHIP.split("");
             String b = "";
             for (String s : a) {
-                if(s.equals("$")){
-                    b += Colors.RED+s;
+                if (s.equals("$")) {
+                    b += Colors.RED + s;
                     continue;
                 }
-                b += Colors.BLUE+s;
+                b += Colors.BLUE + s;
             }
 
 
