@@ -3,7 +3,6 @@ package network;
 import commands.Command;
 import field.Board;
 import utils.LoadingAnimation;
-import utils.Utils;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static utils.Utils.*;
+import static utils.asciiArt.*;
 
 public class GameServer {
     private ServerSocket serverSocket;

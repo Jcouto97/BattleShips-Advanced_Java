@@ -1,6 +1,6 @@
 package utils;
 
-public class Utils {
+public class asciiArt {
     public final static String BATTLESHIP = "\t\t _           _   _   _           _     _       \n" +
             "\t\t| |         | | | | | |         | |   (_)      \n" +
             "\t\t| |__   __ _| |_| |_| | ___  ___| |__  _ _ __  \n" +
