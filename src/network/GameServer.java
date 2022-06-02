@@ -224,11 +224,6 @@ public class GameServer {
             }
         }
 
-        //public void message(String message){
-//        if(isAttacker){
-//
-//        }
-//}
         private void play() {
             new Thread(new Runnable() {
                 @Override
