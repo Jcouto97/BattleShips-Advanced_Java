@@ -43,6 +43,18 @@ public class asciiArt {
                                     "   ~   ~      ~           ~   ~               ~               ~   ~           ~      ~   ~   \n"+
                                     "~         ~         ~                 ~               ~                 ~         ~         ~\n"+Colors.RESET;
 
+    public final static String START_BUTTON =
+                    Colors.GREEN+"\n \t\t\t\t\t\t\t┎────────────────────────────────────┒" +
+                    "\n \t\t\t\t\t\t\t┃  PRESS ENTER TO START THE GAME :)  ┃" +
+                    "\n \t\t\t\t\t\t\t┖────────────────────────────────────┚"+Colors.RESET;
+
+    public final static String LOSER = Colors.RED +
+            "\t\t _                     \n" +
+            "\t\t| |                    \n" +
+            "\t\t| | ___  ___  ___ _ __ \n" +
+            "\t\t| |/ _ \\/ __|/ _ \\ '__|\n" +
+            "\t\t| | (_) \\__ \\  __/ |   \n" +
+            "\t\t|_|\\___/|___/\\___|_|  " + Colors.RESET;
     public final static String LOSER = Colors.RED + "  _      ____   ____   _____ ______ _____  \n" +
             " | |    / __ \\ / __ \\ / ____|  ____|  __ \\ \n" +
             " | |   | |  | | |  | | (___ | |__  | |__) |\n" +
