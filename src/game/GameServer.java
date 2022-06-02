@@ -12,6 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -240,7 +241,7 @@ public class GameServer {
                             try {
                                 clientDC();
                                 close();
-                            } catch (ConcurrentModificationException j) {
+                            } catch (ConcurrentModificationException ignored) {
 
                             }
                         }
@@ -258,29 +259,7 @@ public class GameServer {
                         }
                     }
                     send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
-                    Thread waitTime = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(1000);
-                                ColumnENUM firstParameter = null;
-                                int secondParameter = 0;
-                                Position randomPosition = null;
-                                do {
-                                    firstParameter = ColumnENUM.values()[(int) Math.floor(Math.random() * (ColumnENUM.values().length-1) + 1)];
-                                    secondParameter = (int) Math.floor(Math.random() * (10-1) + 1);
-                                    randomPosition = new Position(firstParameter.getValue(), secondParameter);
-                                } while (board.getListOfPreviousAttacks().contains(randomPosition));
-                                message = "/attack "+firstParameter.getLetter()+" "+secondParameter;
-                                synchronized (messageLock) {
-                                    messageLock.notifyAll();
-                                }
-                            } catch (InterruptedException e) {
-                            }
-                        }
-                    });
-                    waitTime.start();
+                    Thread waitTime = timer();
                     synchronized (messageLock) {
                         messageLock.wait();
                     }
@@ -295,6 +274,42 @@ public class GameServer {
 
                 }
             }
+        }
+
+        private Thread timer() {
+            ColumnENUM firstParameter;
+            int secondParameter;
+            Position randomPosition;
+            boolean exists;
+            do {
+                exists = false;
+                firstParameter = ColumnENUM.values()[(int) Math.floor(Math.random() * (ColumnENUM.values().length - 1) + 1)];
+                secondParameter = (int) Math.floor(Math.random() * (10 - 1) + 1);
+                randomPosition = new Position(firstParameter.getValue(), secondParameter);
+                for (PlayerHandler playerHandler : playerList) {
+                    if (playerHandler.playerGameId == this.playerGameId && !playerHandler.name.equals(this.name)) {
+                        if (playerHandler.board.getListOfPreviousAttacks().contains(randomPosition)) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+            } while (exists);
+
+            ColumnENUM finalFirstParameter = firstParameter;
+            int finalSecondParameter = secondParameter;
+            Thread waitTime = new Thread(() -> {
+                try {
+                    Thread.sleep(30000);
+                    message = "/attack " + finalFirstParameter.getLetter() + " " + finalSecondParameter;
+                    synchronized (messageLock) {
+                        messageLock.notifyAll();
+                    }
+                } catch (InterruptedException ignored) {
+                }
+            });
+            waitTime.start();
+            return waitTime;
         }
 
         private void readyCheck() {
@@ -321,17 +336,6 @@ public class GameServer {
                 }
             }
         }
-
-        public void loser() {
-            for (PlayerHandler players : playerList) {
-                if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
-                    this.setLoser();
-                    this.send("You Lose");
-                    this.close();
-                }
-            }
-        }
-
         /*
         Uses Ascci art from Utils class to make starting menu
          */
@@ -339,11 +343,11 @@ public class GameServer {
             String[] a = BATTLESHIP.split("");
             String b = "";
             for (String s : a) {
-                if(s.equals("$")){
-                    b += Colors.RED+s;
+                if (s.equals("$")) {
+                    b += Colors.RED + s;
                     continue;
                 }
-                b += Colors.BLUE+s;
+                b += Colors.BLUE + s;
             }
 
 

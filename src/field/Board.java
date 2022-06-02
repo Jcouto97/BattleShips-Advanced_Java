@@ -31,19 +31,20 @@ public class Board {
     private final int[] allShipSizes;
     private List<Ship> allTheShips;
 
-    private final Set<Position> listOfPreviousAttacks = new HashSet<>();
+    private final Set<Position> listOfPreviousAttacks;
 
 
     /*
     Constructs the attackers board and defenders board
     Draws both boards (cloneBoard())
-    Adds ships to attackers board2,3,3,4,5
+    Adds ships to attackers board2
     */
     public Board() {
-        allShipSizes = new int[]{2};
-        allTheShips = new ArrayList<>();
+        this.allShipSizes = new int[]{2,3,3,4,5};
+        this.allTheShips = new ArrayList<>();
         this.yourBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
         this.enemyBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
+        this.listOfPreviousAttacks = new HashSet<>();
         int numberOfRows = 1;
         int numberOfCols = 1;
         drawNumbersAndWater(numberOfRows, numberOfCols);
