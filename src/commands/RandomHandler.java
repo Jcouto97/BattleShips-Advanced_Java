@@ -12,6 +12,7 @@ public class RandomHandler implements CommandHandler{
      */
     @Override
     public void command(GameServer.PlayerHandler player, GameServer server) {
+        if(player.getMaxNumberOfRandomBoards() == 0)return;
         player.setBoard(null);
         Board newBoard = new Board();
         player.setBoard(newBoard);
