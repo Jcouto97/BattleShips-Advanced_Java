@@ -2,7 +2,6 @@ package network;
 
 import commands.Command;
 import field.Board;
-import utils.Utils;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -185,10 +184,13 @@ public class GameServer {
         */
         @Override
         public void run() {
+
+            startScreen();
+
             while (!ready) {
+
                 try {
-                    send(BATTLESHIP);
-                    this.message = reader.readLine();
+
                     send(board.getYourBoard()); //mostra primeiro a board e depois se queres ready ou random
                     send("Write /ready to start the game!\nWrite /random for a new board!\nNumber of random boards you can still generate: " + this.maxNumberOfRandomBoards);
                     this.message = reader.readLine();
@@ -223,6 +225,20 @@ public class GameServer {
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }
+
+
+        /*
+        Uses Ascci art from Utils class to make starting menu
+         */
+        private void startScreen() {
+            send(BATTLESHIP + "\n");
+            send(PLANE + "\n\n" + BOAT + "\n \n \t\t\t Press enter to start the game :)");
+            try {
+                this.message = reader.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
