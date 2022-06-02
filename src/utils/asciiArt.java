@@ -19,16 +19,28 @@ public class asciiArt {
                     "                                                                         $$ |               \n" +
                     "                                                                         \\__|               ";
 
-    public final static String PLANE = "\t\t\t\t          __|__\n" +
-            "\t\t\t\t   --------(_)--------\n" +
-            "\t\t\t\t     O  O       O  O";
-
-    public final static String BOAT = "\t\t\t\t     __|__ |___| |\\\n" +
-            "\t\t\t\t     |o__| |___| | \\\n" +
-            "\t\t\t\t     |___| |___| |o \\\n" +
-            "\t\t\t\t    _|___| |___| |__o\\\n" +
-            "\t\t\t\t   /...\\_____|___|____\\_/\n" +
-            "\t\t\t\t   \\   o * o * * o o  /\n" +
-            Colors.BLUE+"   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"+Colors.RESET;
-
+    public final static String PLANE =
+                            "\t\t\t                                         |\n" +
+                            "\t\t\t                  |                      |\n" +
+                            "\t\t\t                  |                    -/_\\-\n" +
+                            "\t\t\t                -/_\\-   ______________(/ . \\)______________\n" +
+                            "\t\t\t   ____________(/ . \\)_____________    \\___/"+Colors.RED+"     <>\n"+Colors.RESET +
+                            "\t\t\t   "+  Colors.RED+"<>"+Colors.RESET+"           \\___/"+ Colors.RED+"     <>    <>\n"+Colors.RESET +
+                            "\t\t"+Colors.WHITE+" swoosh"+Colors.RESET+Colors.MAGENTA+"                                                   ||        \n"+Colors.RESET +
+                            "\t\t\t"+Colors.MAGENTA+"      ||"+Colors.RESET+Colors.WHITE+"                           "+Colors.RESET+Colors.GREEN+"|\\                 "+Colors.RESET+Colors.RED+"<>"+Colors.RESET + Colors.WHITE+"   BIG BOOM\n"+Colors.RESET +
+                            "\t\t\t"+Colors.RED+"      <>"+Colors.RESET+Colors.WHITE+"           "+Colors.RESET+Colors.GREEN+"                ---"+Colors.RESET + Colors.WHITE+"                    INCOMING!!!\n"+Colors.RESET +
+                            Colors.GREEN+"\t\t                                     / | [\n" +
+                            "\t\t                              !      | |||\n" +
+                            "\t\t                            _/|     _/|-++'\n" +
+                            "\t\t                        +  +--|    |--|--|_ |-\n" +
+                            "\t\t                     { /|__|  |/\\__|  |--- |||__/\n" +
+                            "\t\t                    +---------------___[}-_===_.'____                       \n" +
+                            "\t\t                ____`-' ||___-{]_| _[}-  |     |_[___\\==--                 _\n" +
+                            "\t\t __..._____--==/___]_|__|_____________________________[___\\==--____,------' \\ \n" +
+                            "\t\t|                                                            MINDSWAP SS    /\n" +
+                            "\t\t \\_________________________________________________________________________|\n"+Colors.RESET+
+                            Colors.BLUE+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" +
+                                    "   ~   ~      ~           ~   ~               ~               ~   ~           ~      ~   ~   \n"+
+                                    "~         ~         ~                 ~               ~                 ~         ~         ~\n"+Colors.RESET;
+    ;
 }
