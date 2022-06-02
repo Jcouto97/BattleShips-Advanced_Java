@@ -263,7 +263,7 @@ public class GameServer {
                         @Override
                         public void run() {
                             try {
-                                Thread.sleep(1000);
+                                Thread.sleep(30000);
                                 ColumnENUM firstParameter = null;
                                 int secondParameter = 0;
                                 Position randomPosition = null;
@@ -315,23 +315,12 @@ public class GameServer {
         public void clientDC() throws ConcurrentModificationException {
             for (PlayerHandler players : playerList) {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
-                    players.send("You Win");
+                    players.send("\n\n" + WINNER);;
                     players.winner = true;
                     players.close();
                 }
             }
         }
-
-        public void loser() {
-            for (PlayerHandler players : playerList) {
-                if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
-                    this.setLoser();
-                    this.send("You Lose");
-                    this.close();
-                }
-            }
-        }
-
         /*
         Uses Ascci art from Utils class to make starting menu
          */
