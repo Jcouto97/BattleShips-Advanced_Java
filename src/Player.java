@@ -59,20 +59,13 @@ public class Player {
                     try {
 
                         String message = consoleReader.readLine();
-                        String[] words = message.split(" ",2);
                         // condição para quando tivermos o "QuitHandle" a funcionar
                         if (message == null) {
                             keyboardSocket.close();
                             continue;
                         }
-                        if(words[0].equals("specialCode")){
-                            System.out.print(words[1]);
-                            Thread.sleep(900);
-                            System.out.print("\b".repeat(words[1].length()));
-                            continue;
-                        }
                         System.out.println(message);
-                    } catch (IOException | InterruptedException e) {
+                    } catch (IOException e) {
                         System.exit(1); //Terminar players se server estiver terminado
                     }
                 }

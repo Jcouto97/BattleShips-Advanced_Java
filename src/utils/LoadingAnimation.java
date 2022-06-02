@@ -15,11 +15,8 @@ public class LoadingAnimation {
             for (int i = 0; i < lastLine.length(); i++) {
                 temp += " ";
             }
-            /*if (temp.length() > 1)
-                playerHandler.send("specialCode " + temp);*/
-
         }
-        playerHandler.send("specialCode " + line);
+        playerHandler.send(line);
 
         lastLine = line;
     }

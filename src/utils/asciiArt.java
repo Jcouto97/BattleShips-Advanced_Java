@@ -56,7 +56,9 @@ public class asciiArt {
             " | |___| |__| | |__| |____) | |____| | \\ \\ \n" +
             " |______\\____/ \\____/|_____/|______|_|  \\_\\" + Colors.RESET;
 
-    public final static String WINNER = Colors.YELLOW + " \t\t\t  .-=========-.\n" +
+    public final static String WINNER = Colors.YELLOW +
+            "                 WINNER!\n" +
+            " \t\t\t  .-=========-.\n" +
             "              \\'-=======-'/\n" +
             "              _|   .=.   |_\n" +
             "             ((|  {{1}}  |))\n" +
