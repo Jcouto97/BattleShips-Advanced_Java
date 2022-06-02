@@ -251,7 +251,7 @@ public class GameServer {
 
 
             send(b + "\n" + Colors.RESET);
-            send(PLANE + "\n \n \t\t\t\t\t\t\t PRESS ENTER TO START THE GAME :)");
+            send(PLANE + "\n" + START_BUTTON);
             try {
                 this.message = reader.readLine();
             } catch (IOException e) {
