@@ -3,8 +3,9 @@ package commands;
 import colors.Colors;
 import field.ColumnENUM;
 import field.Position;
+import gameobjects.Ship;
+import gameobjects.ShipsENUM;
 import network.GameServer;
-
 
 
 public class AttackHandler implements CommandHandler {
@@ -46,13 +47,13 @@ public class AttackHandler implements CommandHandler {
                 }
 
                 attacker.getPlayerBoard().updateAdversaryBoard(hitPosition, hit); //Update the attackers enemy board;
-                reDrawDefenderBoards(defender); //Redraws both of the defender boards (attacker and defender);
+                reDrawPlayerBoards(defender); //Redraws both of the defender boards (attacker and defender);
 
                 if (checkIfMissShip(attacker, defender, hit)) {
                     break; // check if missed ship
                 }
 
-                shipHit(hitPosition, defender); // hit the ship and reduces its life
+                shipHit(hitPosition, defender, attacker); // hit the ship and reduces its life
                 winnerAndLoser(attacker, defender); // check if there is a winner
             }
         }
@@ -88,16 +89,16 @@ public class AttackHandler implements CommandHandler {
     /*
      Redraws both of the defender boards (attacker and defender);
      */
-    private void reDrawDefenderBoards(GameServer.PlayerHandler defender) {
-        defender.send(defender.getPlayerBoard().getYourBoard());
-        defender.send(defender.getPlayerBoard().getAdversaryBoard());
+    private void reDrawPlayerBoards(GameServer.PlayerHandler player) {
+        player.send(player.getPlayerBoard().getYourBoard());
+        player.send(player.getPlayerBoard().getAdversaryBoard());
     }
 
     /*
     Check if missed ship, to see if continues to attack
      */
     private boolean checkIfMissShip(GameServer.PlayerHandler attacker, GameServer.PlayerHandler defender, String hit) {
-        if (!hit.equals(Colors.RED+"╬"+Colors.RESET)) {
+        if (!hit.equals(Colors.RED + "╬" + Colors.RESET)) {
             attacker.setAttacker(false);
             defender.setAttacker(true);
             return true;
@@ -111,19 +112,37 @@ public class AttackHandler implements CommandHandler {
      1º For, iterates through array of ships;
      2º For, iterates through the ship positions;
      */
-    private void shipHit(Position hitPosition, GameServer.PlayerHandler defender) {
+    private void shipHit(Position hitPosition, GameServer.PlayerHandler defender, GameServer.PlayerHandler attacker) {
         for (int i = 0; i < defender.getPlayerBoard().getAllTheShips().size(); i++) { //inside the array of ships
             for (int j = 0; j < defender.getPlayerBoard().getAllTheShips().get(i).getFullShip().size(); j++) { //inside the ship
                 if (defender.getPlayerBoard().getAllTheShips().get(i).getFullShip().get(j).equals(hitPosition)) { //se no ship 0 e na posiçao 0 == hit position, da hit
                     defender.getPlayerBoard().getAllTheShips().get(i).shipHit();
 
-                    if (defender.getPlayerBoard().getAllTheShips().get(i).getNumberOfHits() == 0) { //number of hits remaining to die
+                    if (defender.getPlayerBoard().getAllTheShips().get(i).getNumberOfHits() == 0
+                            && !defender.getPlayerBoard().getAllTheShips().get(i).isDead()) { //number of hits remaining to die
                         defender.getPlayerBoard().getAllTheShips().get(i).setDead();
+
+                        Ship ship = defender.getPlayerBoard().getAllTheShips().get(i);
+                        shipBorder(ship, defender, attacker);
                     }
                     return;
                 }
             }
         }
+    }
+
+    private void shipBorder(Ship ship, GameServer.PlayerHandler defender, GameServer.PlayerHandler attacker) {
+        for (int i = 0; i < ship.getFullShip().size(); i++) {
+            for (int j = 0; j < ShipsENUM.values().length; j++) {
+                Position tempPosition = new Position(ship.getFullShip().get(i).getX() + ShipsENUM.values()[j].getAxisX()
+                        , ship.getFullShip().get(i).getY() + ShipsENUM.values()[j].getAxisY());
+
+                if (defender.getPlayerBoard().hit(tempPosition).equals(Colors.BLACK_BRIGHT + "■" + Colors.RESET)) {
+                    attacker.getPlayerBoard().updateAdversaryBoard(tempPosition, Colors.BLACK_BRIGHT + "■" + Colors.RESET);
+                }
+            }
+        }
+        reDrawPlayerBoards(defender);
     }
 
     /*
@@ -132,6 +151,7 @@ public class AttackHandler implements CommandHandler {
     private void winnerAndLoser(GameServer.PlayerHandler attacker, GameServer.PlayerHandler defender) {
         if (!defender.checkIfTheresShipsAlive()) {
             defender.setLoser();
+            reDrawPlayerBoards(attacker);
             defender.send("You Lost");
             attacker.send("You Win");
             defender.close();
