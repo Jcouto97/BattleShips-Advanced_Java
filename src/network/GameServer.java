@@ -244,13 +244,14 @@ public class GameServer {
             String b = "";
             for (String s : a) {
                 if(s.equals("$")){
-                    b += Colors.BLUE+s;
+                    b += Colors.RED+s;
+                    continue;
                 }
-                b += Colors.YELLOW+s;
+                b += Colors.BLUE+s;
             }
 
 
-            send(b + "\n");
+            send(b + "\n" + Colors.RESET);
             send(PLANE + "\n\n" + BOAT + "\n \n \t\t\t Press enter to start the game :)");
             try {
                 this.message = reader.readLine();
