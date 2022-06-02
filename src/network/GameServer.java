@@ -2,12 +2,15 @@ package network;
 
 import commands.Command;
 import field.Board;
+import field.ColumnENUM;
+import field.Position;
 import utils.LoadingAnimation;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -145,11 +148,13 @@ public class GameServer {
         private String message;
         private boolean isAttacker;
         private final Object lock;
+        private final Object messageLock;
         private boolean loser;
         private boolean ready;
         private int maxNumberOfRandomBoards;
         private LoadingAnimation loadingAnimation;
         private int playerGameId;
+        private boolean winner;
 
         /*
         Constructor that receives a name and a playerSocket
@@ -169,7 +174,9 @@ public class GameServer {
             this.reader = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
             this.isAttacker = false;
             this.loser = false;
+            this.winner = false;
             this.lock = new Object();
+            this.messageLock = new Object();
             this.ready = false;
             this.maxNumberOfRandomBoards = 3;
             this.loadingAnimation = new LoadingAnimation();
@@ -211,11 +218,39 @@ public class GameServer {
             startScreen();
             readyCheck();
             playerGameId = gameIds;
-            waitingRoom(this); //1st player will wait for the 2nd to start the game
-            play();
+            while (true) {
+                waitingRoom(this); //1st player will wait for the 2nd to start the game
+                play();
+            }
         }
 
+        //public void message(String message){
+//        if(isAttacker){
+//
+//        }
+//}
         private void play() {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (!playerSocket.isClosed()) {
+                        try {
+
+                            message = reader.readLine();
+                            synchronized (messageLock) {
+                                messageLock.notifyAll();
+                            }
+                        } catch (IOException e) {
+                            try {
+                                clientDC();
+                                close();
+                            } catch (ConcurrentModificationException j) {
+
+                            }
+                        }
+                    }
+                }
+            }).start();
             while (!playerSocket.isClosed()) {
                 try {
                     send(board.getYourBoard());
@@ -227,15 +262,41 @@ public class GameServer {
                         }
                     }
                     send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
-                    this.message = reader.readLine();//o que vem do player //blocking method
+                    Thread waitTime = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(1000);
+                                ColumnENUM firstParameter = null;
+                                int secondParameter = 0;
+                                Position randomPosition = null;
+                                do {
+                                    firstParameter = ColumnENUM.values()[(int) Math.floor(Math.random() * (ColumnENUM.values().length-1) + 1)];
+                                    secondParameter = (int) Math.floor(Math.random() * (10-1) + 1);
+                                    randomPosition = new Position(firstParameter.getValue(), secondParameter);
+                                } while (board.getListOfPreviousAttacks().contains(randomPosition));
+                                message = "/attack "+firstParameter.getLetter()+" "+secondParameter;
+                                synchronized (messageLock) {
+                                    messageLock.notifyAll();
+                                }
+                            } catch (InterruptedException e) {
+                            }
+                        }
+                    });
+                    waitTime.start();
+                    synchronized (messageLock) {
+                        messageLock.wait();
+                    }
+                    waitTime.interrupt();
+                    //o que vem do player //blocking method
                     if (isCommand(message)) {
                         dealWithCommand(message);
                     } else if (!isCommand(message)) {
                         send("Not a command, try again!");
                     }
-                } catch (IOException | InterruptedException e) {
-                    clientDC();
-                    close();
+                } catch (InterruptedException ignored) {
+
                 }
             }
         }
@@ -255,10 +316,11 @@ public class GameServer {
             }
         }
 
-        public void clientDC(){
+        public void clientDC() throws ConcurrentModificationException {
             for (PlayerHandler players : playerList) {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
                     players.send("You Win");
+                    players.winner = true;
                     players.close();
                 }
             }
@@ -269,8 +331,6 @@ public class GameServer {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
                     this.setLoser();
                     this.send("You Lose");
-                    players.send("You Win");
-                    players.close();
                     this.close();
                 }
             }
@@ -319,7 +379,7 @@ public class GameServer {
                 writer.flush();
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+
             }
         }
 

@@ -10,8 +10,7 @@ public enum ColumnENUM {
     F ("F", 6),
     G ("G", 7),
     H ("H", 8),
-    I ("I", 9),
-    J ("J", 10);
+    I ("I", 9);
 
     private final String letter;
     private final int value;

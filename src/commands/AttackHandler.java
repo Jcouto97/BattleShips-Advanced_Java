@@ -57,9 +57,6 @@ public class AttackHandler implements CommandHandler {
                 winnerAndLoser(attacker, defender); // check if there is a winner
             }
         }
-        for (int i = 0; i < server.getPlayerList().size(); i++) {
-
-        }
         for (GameServer.PlayerHandler players : server.getPlayerList()) {
             if (attacker.getPlayerGameId() == players.getPlayerGameId()){
                 synchronized (players.getLock()) {
@@ -68,7 +65,6 @@ public class AttackHandler implements CommandHandler {
             }
         }
     }
-
     /*
     Checks if is the same position
     */
@@ -90,7 +86,6 @@ public class AttackHandler implements CommandHandler {
         }
         return false;
     }
-
     /*
      Redraws both of the defender boards (attacker and defender);
      */
@@ -110,8 +105,6 @@ public class AttackHandler implements CommandHandler {
         }
         return false;
     }
-
-
     /*
      Hit the ship and reduces its life
      1º For, iterates through array of ships;
@@ -135,7 +128,6 @@ public class AttackHandler implements CommandHandler {
             }
         }
     }
-
     private void shipBorder(Ship ship, GameServer.PlayerHandler defender, GameServer.PlayerHandler attacker) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
             for (int j = 0; j < ShipsENUM.values().length; j++) {
@@ -149,7 +141,6 @@ public class AttackHandler implements CommandHandler {
         }
         reDrawPlayerBoards(defender);
     }
-
     /*
     Checks if there is a winner
      */
@@ -157,6 +148,8 @@ public class AttackHandler implements CommandHandler {
         if (!defender.checkIfTheresShipsAlive()) {
             defender.loser();
             reDrawPlayerBoards(attacker);
+            attacker.send("You Win");
+            attacker.close();
         }
     }
 

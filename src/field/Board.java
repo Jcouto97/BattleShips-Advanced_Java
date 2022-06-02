@@ -37,10 +37,10 @@ public class Board {
     /*
     Constructs the attackers board and defenders board
     Draws both boards (cloneBoard())
-    Adds ships to attackers board3,3,4,5
+    Adds ships to attackers board2,3,3,4,5
     */
     public Board() {
-        allShipSizes = new int[]{2,2};
+        allShipSizes = new int[]{2,3,3,4,5};
         allTheShips = new ArrayList<>();
         this.yourBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
         this.enemyBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
@@ -88,13 +88,17 @@ public class Board {
         }
     }
 
+    public Set<Position> getListOfPreviousAttacks() {
+        return listOfPreviousAttacks;
+    }
+
     /*
-    It loops until all the ships are created
-    Creates a new ship with a random position
-    Verifies if it's inside the limit of the board
-    Verifies if there's collision between ships and if there are any ships around it
-    If ship passes all checks, it draws them on the board and adds them to a list of ships
-     */
+        It loops until all the ships are created
+        Creates a new ship with a random position
+        Verifies if it's inside the limit of the board
+        Verifies if there's collision between ships and if there are any ships around it
+        If ship passes all checks, it draws them on the board and adds them to a list of ships
+         */
     public void addShip() {
         int nextIndex = 0;
         while (allShipSizes.length > nextIndex) {
