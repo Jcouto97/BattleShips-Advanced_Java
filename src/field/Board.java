@@ -1,5 +1,6 @@
 package field;
 
+import colors.Colors;
 import gameobjects.Ship;
 import gameobjects.ShipsENUM;
 
@@ -18,10 +19,10 @@ Creates an array with all the sizes of the ships in ascendent order
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
     private final static String EMPTY_SPACE = " ";
-    private final static String WATER = "~";
-    private final static String BOAT_PIECE = "#";
-    private final static String BOAT_PIECE_HIT = "X";
-    private final static String WATER_HIT = ".";
+    private final static String WATER = "░";
+    private final static String BOAT_PIECE = "█";
+    private final static String BOAT_PIECE_HIT = "╬";
+    private final static String WATER_HIT = "■";
 
 
     private final String[][] yourBoard;
@@ -84,7 +85,7 @@ public class Board {
                     numberOfCols++;
                     continue;
                 }
-                this.yourBoard[rows][cols] = WATER;
+                this.yourBoard[rows][cols] = Colors.BLUE+WATER+Colors.RESET;
             }
         }
     }
@@ -121,7 +122,8 @@ public class Board {
     // # = ship
     private void drawShipOnBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
-            this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] = BOAT_PIECE;
+            this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] =
+                    Colors.YELLOW + BOAT_PIECE + Colors.RESET;
         }
     }
 
@@ -218,15 +220,15 @@ public class Board {
         }
 
         if (isShip(position)) {
-            yourBoard[position.getX()][position.getY()] = BOAT_PIECE_HIT;
-            return BOAT_PIECE_HIT;
+            yourBoard[position.getX()][position.getY()] = Colors.RED+BOAT_PIECE_HIT+Colors.RESET;
+            return Colors.RED+BOAT_PIECE_HIT+Colors.RESET;
         }
-        yourBoard[position.getX()][position.getY()] = WATER_HIT;
-        return WATER_HIT;
+        yourBoard[position.getX()][position.getY()] = Colors.BLACK_BRIGHT+WATER_HIT+Colors.RESET;
+        return Colors.BLACK_BRIGHT+WATER_HIT+Colors.RESET;
     }
 
     private boolean isShip(Position position) {
-        if (yourBoard[position.getX()][position.getY()].equals(BOAT_PIECE) || enemyBoard[position.getX()][position.getY()].equals(BOAT_PIECE)) {
+        if (yourBoard[position.getX()][position.getY()].equals(Colors.YELLOW + BOAT_PIECE + Colors.RESET)) {
             return true;
         }
         return false;

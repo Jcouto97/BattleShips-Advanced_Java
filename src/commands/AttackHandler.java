@@ -1,8 +1,11 @@
 package commands;
 
+import colors.Colors;
 import field.ColumnENUM;
 import field.Position;
 import network.GameServer;
+
+
 
 public class AttackHandler implements CommandHandler {
 
@@ -94,7 +97,7 @@ public class AttackHandler implements CommandHandler {
     Check if missed ship, to see if continues to attack
      */
     private boolean checkIfMissShip(GameServer.PlayerHandler attacker, GameServer.PlayerHandler defender, String hit) {
-        if (!hit.equals("X")) {
+        if (!hit.equals(Colors.RED+"╬"+Colors.RESET)) {
             attacker.setAttacker(false);
             defender.setAttacker(true);
             return true;
