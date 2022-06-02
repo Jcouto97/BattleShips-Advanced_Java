@@ -218,7 +218,7 @@ public class GameServer {
                         }
                     }
                     send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
-                    send(loadingAnimation.animationTime(loadingAnimation, 20));
+                    send(loadingAnimation.animationTime(loadingAnimation, 20, this));
 
 
                     this.message = reader.readLine();//o que vem do player //blocking method
