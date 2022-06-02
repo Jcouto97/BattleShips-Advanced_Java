@@ -2,6 +2,8 @@ package network;
 
 import commands.Command;
 import field.Board;
+import utils.LoadingAnimation;
+import utils.Utils;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static utils.Utils.*;
 
 public class GameServer {
     private ServerSocket serverSocket;
@@ -147,6 +151,7 @@ public class GameServer {
             this.lock = new Object();
             this.ready = false;
             this.maxNumberOfRandomBoards = 3;
+            this.loadingAnimation = new LoadingAnimation();
         }
 
         /*
@@ -182,10 +187,13 @@ public class GameServer {
         */
         @Override
         public void run() {
+
+            startScreen();
+
             while (!ready) {
+
                 try {
-                    send("Start Screen\nHit enter to continue");
-                    this.message = reader.readLine();
+
                     send(board.getYourBoard()); //mostra primeiro a board e depois se queres ready ou random
                     send("Write /ready to start the game!\nWrite /random for a new board!\nNumber of random boards you can still generate: " + this.maxNumberOfRandomBoards);
                     this.message = reader.readLine();
@@ -206,6 +214,7 @@ public class GameServer {
                     while (!isAttacker) {
                         synchronized (lock) {
                             send("Waiting for adversary attack!");
+                            send(String.valueOf(loadingAnimation.animationTime(loadingAnimation, 21)));
                             lock.wait();
                         }
                     }
@@ -220,6 +229,20 @@ public class GameServer {
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }
+
+
+        /*
+        Uses Ascci art from Utils class to make starting menu
+         */
+        private void startScreen() {
+            send(BATTLESHIP + "\n");
+            send(PLANE + "\n\n" + BOAT + "\n \n \t\t\t Press enter to start the game :)");
+            try {
+                this.message = reader.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
