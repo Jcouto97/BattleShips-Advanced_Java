@@ -1,7 +1,7 @@
 package commands;
 
 import field.Board;
-import network.GameServer;
+import game.GameServer;
 
 public class RandomHandler implements CommandHandler{
     /*
