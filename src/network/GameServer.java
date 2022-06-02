@@ -184,6 +184,8 @@ public class GameServer {
         public void run() {
             while (!ready) {
                 try {
+                    send("Start Screen\nHit enter to continue");
+                    this.message = reader.readLine();
                     send(board.getYourBoard()); //mostra primeiro a board e depois se queres ready ou random
                     send("Write /ready to start the game!\nWrite /random for a new board!\nNumber of random boards you can still generate: " + this.maxNumberOfRandomBoards);
                     this.message = reader.readLine();
