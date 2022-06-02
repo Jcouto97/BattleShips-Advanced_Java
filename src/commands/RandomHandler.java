@@ -4,11 +4,12 @@ import field.Board;
 import game.GameServer;
 
 public class RandomHandler implements CommandHandler{
-    /*
-    To randomize the player board:
-    1º Sets his board to null;
-    2º Creates a new Board
-    3º Sets player board to new board
+
+    /**
+     * To randomize the player board;
+     * Sets his board to null;
+     * Creates a new Board;
+     * Sets player board to new board;
      */
     @Override
     public void command(GameServer.PlayerHandler player, GameServer server) {
