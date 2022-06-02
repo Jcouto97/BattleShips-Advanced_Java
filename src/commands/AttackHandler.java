@@ -66,9 +66,10 @@ public class AttackHandler implements CommandHandler {
             }
         }
     }
-    /*
-    Checks if is the same position
-    */
+
+    /**
+     * Checks if hitting in the same position
+     */
     private boolean samePosition(GameServer.PlayerHandler attacker, String hit) {
         if (hit.equals("Same position")) {
             attacker.send("You already attacked in those coordinates, try again!");
@@ -77,8 +78,8 @@ public class AttackHandler implements CommandHandler {
         return false;
     }
 
-    /*
-    Check is it´s out of bounds
+    /**
+     * Check hit is it´s out of bounds (of the board)
      */
     private boolean checkOutOfBounds(GameServer.PlayerHandler attacker, String hit) {
         if (hit.equals("Out of bounds")) {
@@ -87,16 +88,17 @@ public class AttackHandler implements CommandHandler {
         }
         return false;
     }
-    /*
-     Redraws both of the defender boards (attacker and defender);
+
+    /**
+     * Redraws both defender and attacker boards;
      */
     private void reDrawPlayerBoards(GameServer.PlayerHandler player) {
         player.send(player.getPlayerBoard().getYourBoard());
         player.send(player.getPlayerBoard().getAdversaryBoard());
     }
 
-    /*
-    Check if missed ship, to see if continues to attack
+    /**
+     * Check if attacker misses ship, in order to continue to attack
      */
     private boolean checkIfMissShip(GameServer.PlayerHandler attacker, GameServer.PlayerHandler defender, String hit) {
         if (!hit.equals(Colors.RED + "╬" + Colors.RESET)) {
@@ -106,10 +108,14 @@ public class AttackHandler implements CommandHandler {
         }
         return false;
     }
-    /*
-     Hit the ship and reduces its life
-     1º For, iterates through array of ships;
-     2º For, iterates through the ship positions;
+
+    /**
+     *  Hit the ship and reduces its life
+     *  1º loop, iterates through array of ships;
+     *  2º loop, iterates through the ship positions;
+     *  In that position hit the ship;
+     *  If ships number of hits == 0 then set ship isDead bollean to true;
+     *  Calls shipBorder function to surround dead ship;
      */
     private void shipHit(Position hitPosition, GameServer.PlayerHandler defender, GameServer.PlayerHandler attacker) {
         for (int i = 0; i < defender.getPlayerBoard().getAllTheShips().size(); i++) { //inside the array of ships
@@ -117,18 +123,23 @@ public class AttackHandler implements CommandHandler {
                 if (defender.getPlayerBoard().getAllTheShips().get(i).getFullShip().get(j).equals(hitPosition)) { //se no ship 0 e na posiçao 0 == hit position, da hit
                     defender.getPlayerBoard().getAllTheShips().get(i).shipHit();
 
-                    if (defender.getPlayerBoard().getAllTheShips().get(i).getNumberOfHits() == 0
-                            && !defender.getPlayerBoard().getAllTheShips().get(i).isDead()) { //number of hits remaining to die
+                    if (defender.getPlayerBoard().getAllTheShips().get(i).getNumberOfHits() == 0 //number of hits remaining to die
+                            && !defender.getPlayerBoard().getAllTheShips().get(i).isDead()) { //and if its not dead
                         defender.getPlayerBoard().getAllTheShips().get(i).setDead();
 
                         Ship ship = defender.getPlayerBoard().getAllTheShips().get(i);
-                        shipBorder(ship, defender, attacker);
+                        shipBorder(ship, defender, attacker); //ship border when dead
                     }
                     return;
                 }
             }
         }
     }
+
+    /**
+     * Uses full ship size + ShipsEnums to make ship border when ship is dead
+     * Updates attacker board and redraws defenders
+     */
     private void shipBorder(Ship ship, GameServer.PlayerHandler defender, GameServer.PlayerHandler attacker) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
             for (int j = 0; j < ShipsENUM.values().length; j++) {
@@ -136,7 +147,7 @@ public class AttackHandler implements CommandHandler {
                         , ship.getFullShip().get(i).getY() + ShipsENUM.values()[j].getAxisY());
 
                 if (defender.getPlayerBoard().hit(tempPosition).equals(Colors.BLACK_BRIGHT + "■" + Colors.RESET)) {
-                    attacker.getPlayerBoard().updateAdversaryBoard(tempPosition, Colors.BLACK_BRIGHT + "■" + Colors.RESET);
+                    attacker.getPlayerBoard().updateAdversaryBoard(tempPosition, Colors.BLACK_BRIGHT + "■" + Colors.RESET); //update in attackers adversary board the hit
                 }
             }
         }
@@ -144,6 +155,12 @@ public class AttackHandler implements CommandHandler {
     }
     /*
     Checks if there is a winner
+     */
+
+    /**
+     * If defenders boats are all dead define winner and looser
+     * Send AsciiArt
+     * Close sockets
      */
     private void winnerAndLoser(GameServer.PlayerHandler attacker, GameServer.PlayerHandler defender) {
         if (!defender.checkIfTheresShipsAlive()) {
