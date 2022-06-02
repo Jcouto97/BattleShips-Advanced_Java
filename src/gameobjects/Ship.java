@@ -11,16 +11,18 @@ public class Ship {
     private List<Position> fullShip; // the full ship with positions
     private int numberOfHits;
     private boolean isDead;
-    /*
-    Initialize ship with size and position (head);
-    Enum for beginning direction;
-    Add the head to the fullShip (empty list);
-    CurrentPosition variable that will change in the for loop;
-    Iterate according to the size given on the constructor and insert a new updated position to the body according to
-    the chosen enum, add position to body and update current position, repeat until size is met. OFFSET used to
-    ignore the last 4 enums.
-     */
 
+    /**
+     * Initialize ship with size and position (head);
+     * Enum for beginning direction;
+     * Add the head to the fullShip (empty list);
+     * CurrentPosition variable that will change in the for loop;
+     * Iterate according to the size given on the constructor and insert a new updated position to the body according to
+     * the chosen enum, add position to body and update current position, repeat until size is met. OFFSET used to
+     * ignore the last 4 enums;
+     * @param size for ship size
+     * @param position ships starting position (head)
+     */
     public Ship(int size, Position position) {
         this.fullShip = new ArrayList<>();
         this.size = size;

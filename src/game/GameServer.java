@@ -5,8 +5,6 @@ import commands.Command;
 import field.Board;
 import field.ColumnENUM;
 import field.Position;
-import utils.LoadingAnimation;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -32,13 +30,12 @@ public class GameServer {
         this.lock2 = new Object();
         isWaiting = false;
     }
-
     /*
         Starts server with port as a parameter;
         Starts a thread pool with unlimited thread space;
         Starts a new list were players will be added;
         Adds number of connections of players to the server;
-         */
+    */
     public void start(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
@@ -59,7 +56,7 @@ public class GameServer {
     Randomizes witch player starts as attacker
     If only 1 player enter it will jump to lock2.wait until 2nd player joins
     Then it will notifyAll() threads to start game
-     */
+    */
     private void waitingRoom(PlayerHandler player) {
         if (isWaiting) {
             synchronized (lock2) {
@@ -139,7 +136,6 @@ public class GameServer {
 
     /*
     Object that stores each player info
-
      */
     public class PlayerHandler implements Runnable {
         private final String name;
@@ -154,7 +150,6 @@ public class GameServer {
         private boolean loser;
         private boolean ready;
         private int maxNumberOfRandomBoards;
-        private LoadingAnimation loadingAnimation;
         private int playerGameId;
         private boolean winner;
 
@@ -181,7 +176,6 @@ public class GameServer {
             this.messageLock = new Object();
             this.ready = false;
             this.maxNumberOfRandomBoards = 3;
-            this.loadingAnimation = new LoadingAnimation();
         }
 
         /*
@@ -227,23 +221,20 @@ public class GameServer {
         }
 
         private void play() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!playerSocket.isClosed()) {
+            new Thread(() -> {
+                while (!playerSocket.isClosed()) {
+                    try {
+
+                        message = reader.readLine();
+                        synchronized (messageLock) {
+                            messageLock.notifyAll();
+                        }
+                    } catch (IOException e) {
                         try {
+                            clientDC();
+                            close();
+                        } catch (ConcurrentModificationException j) {
 
-                            message = reader.readLine();
-                            synchronized (messageLock) {
-                                messageLock.notifyAll();
-                            }
-                        } catch (IOException e) {
-                            try {
-                                clientDC();
-                                close();
-                            } catch (ConcurrentModificationException ignored) {
-
-                            }
                         }
                     }
                 }
@@ -330,7 +321,7 @@ public class GameServer {
         public void clientDC() throws ConcurrentModificationException {
             for (PlayerHandler players : playerList) {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
-                    players.send("You Win");
+                    players.send("\n\n" + WINNER);;
                     players.winner = true;
                     players.close();
                 }
@@ -343,11 +334,11 @@ public class GameServer {
             String[] a = BATTLESHIP.split("");
             String b = "";
             for (String s : a) {
-                if (s.equals("$")) {
-                    b += Colors.RED + s;
+                if(s.equals("$")){
+                    b += Colors.RED+s;
                     continue;
                 }
-                b += Colors.BLUE + s;
+                b += Colors.BLUE+s;
             }
 
 

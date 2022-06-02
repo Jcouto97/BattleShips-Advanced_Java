@@ -9,13 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-/*
-Board is a class that creates game boards
-Creates a board for the attacker and another for the defender
-Creates a list of all the players ships
-Creates an array with all the sizes of the ships in ascendent order
-*/
+/**
+ * Board is a class that creates game boards, it creates one for the attacker and another for the defender.
+ * It also creates a list of all the players ships and an array with all the sizes of the ships in ascendent order.
+ */
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
     private final static String EMPTY_SPACE = " ";
@@ -23,22 +20,18 @@ public class Board {
     private final static String BOAT_PIECE = "█";
     private final static String BOAT_PIECE_HIT = "╬";
     private final static String WATER_HIT = "■";
-
-
+    private final static String LINE_BREAK = "\n";
     private final String[][] yourBoard;
     private final String[][] enemyBoard;
-
     private final int[] allShipSizes;
     private List<Ship> allTheShips;
-
     private final Set<Position> listOfPreviousAttacks;
 
-
-    /*
-    Constructs the attackers board and defenders board
-    Draws both boards (cloneBoard())
-    Adds ships to attackers board2
-    */
+    /**
+     * Constructs the attackers and defenders board;
+     * Draws both boards (cloneBoard());
+     * Adds ships to attackers board.
+     */
     public Board() {
         this.allShipSizes = new int[]{2,3,3,4,5};
         this.allTheShips = new ArrayList<>();
@@ -47,14 +40,14 @@ public class Board {
         this.listOfPreviousAttacks = new HashSet<>();
         int numberOfRows = 1;
         int numberOfCols = 1;
-        drawNumbersAndWater(numberOfRows, numberOfCols);
+        drawBoardLayout(numberOfRows, numberOfCols);
         cloneBoard();
         addShip();
     }
 
-    /*
-    Creates a clone of the attackers board, filled with water ONLY "~"
-    It's the adversarys board, but only to keep track of where I attack
+    /**
+     * This method creates a clone of the attackers board, filled with water ONLY -> "■".
+     * This cloned board is the adversarys board that we will attack on.
      */
     public void cloneBoard() {
         for (int rows = 0; rows < this.yourBoard.length; rows++) {
@@ -67,7 +60,13 @@ public class Board {
     /*
     Draw the attackers board with rows and columns, and filled with water "~"
      */
-    private void drawNumbersAndWater(int numberOfRows, int numberOfCols) {
+
+    /**
+     * This method draws the attackers board rows, columns, and content in between
+     * @param numberOfRows This parameter receives the max number of rows
+     * @param numberOfCols This parameter receives the max number of columns
+     */
+    private void drawBoardLayout(int numberOfRows, int numberOfCols) {
         for (int rows = 0; rows < this.yourBoard.length; rows++) {
             for (int cols = 0; cols < this.yourBoard[rows].length; cols++) {
                 if (rows == 0 && cols == 0) {
@@ -84,7 +83,7 @@ public class Board {
                     numberOfCols++;
                     continue;
                 }
-                this.yourBoard[rows][cols] = Colors.BLUE+WATER+Colors.RESET;
+                this.yourBoard[rows][cols] = Colors.BLUE + WATER + Colors.RESET;
             }
         }
     }
@@ -93,25 +92,22 @@ public class Board {
         return listOfPreviousAttacks;
     }
 
-    /*
-        It loops until all the ships are created
-        Creates a new ship with a random position
-        Verifies if it's inside the limit of the board
-        Verifies if there's collision between ships and if there are any ships around it
-        If ship passes all checks, it draws them on the board and adds them to a list of ships
-         */
+    /**
+     * This method loops until all the ships are created;
+     * Creates a new ship with a random position;
+     * Verifies if it's inside the limit of the board;
+     * Verifies if there's collision between ships and if there are any ships around each other;
+     * If all checks are cleared, it draws the ships on the board and adds them to a list of ships.
+     */
     public void addShip() {
         int nextIndex = 0;
         while (allShipSizes.length > nextIndex) {
-            // creates a new ship
             Ship ship = new Ship(allShipSizes[nextIndex], new Position((int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1, (int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1));
 
-            //check if ship is inside board and on top of other ship
             if (!isShipInsideBoard(ship) || isShipOnTopOfOtherShip(ship)) {
                 ship = null;
             }
 
-            // draws ship on the board and adds to a list of ships
             if (ship != null) {
                 drawShipOnBoard(ship);
                 allTheShips.add(ship);
@@ -120,9 +116,10 @@ public class Board {
         }
     }
 
-    // draws ship on the board
-    // for each iterations it sets one piece of the body on the next position
-    // # = ship
+    /**
+     * This method draws the head of the ship on the board, and for each iteration of the loop, it sets the next ship piece on the corresponding position
+     * @param ship This parameter receives a ship.
+     */
     private void drawShipOnBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
             this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] =
@@ -130,7 +127,11 @@ public class Board {
         }
     }
 
-    // check if ship is inside the boards limits if it is return true if its outside return false
+    /**
+     * This method checks if a ship is inside the boards limits.
+     * @param ship This parameter receives a ship.
+     * @return Returns true if a boat is inside the board, and false if it is outside.
+     */
     private boolean isShipInsideBoard(Ship ship) {
         for (int i = 0; i < ship.getFullShip().size(); i++) {
             if (ship.getFullShip().get(i).getX() < 1
@@ -146,6 +147,12 @@ public class Board {
     // check if ship is on top of another and there is no ship around the new ship
     /*
 
+     */
+
+    /**
+     * This method checks if a ship is over another, and also if there are no ships around it by 1 position in every direction
+     * @param ship This parameter receives a ship.
+     * @return Returns true if all conditions check out, and false if not.
      */
     private boolean isShipOnTopOfOtherShip(Ship ship) {
         if (ship == null) {
@@ -167,6 +174,15 @@ public class Board {
     }
 
     //check if the new ship created is connected to the other ships
+
+    /**
+     * This method checks if the ship which was created is connected to other ships
+     * @param ship This parameter receives a ship.
+     * @param newShipPositions
+     * @param indexOfAllShips
+     * @param shipPositions
+     * @return
+     */
     private boolean checkIfShipsConnected(Ship ship, int newShipPositions, int indexOfAllShips, int shipPositions) {
         for (int indexShipEnum = 0; indexShipEnum < ShipsENUM.values().length; indexShipEnum++) {
             if (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).getX() == (ship.getFullShip()
@@ -190,7 +206,7 @@ public class Board {
             for (String cols : rows) {
                 boardString = boardString.concat(EMPTY_SPACE + cols + EMPTY_SPACE);
             }
-            boardString = boardString.concat("\n");
+            boardString = boardString.concat(LINE_BREAK);
         }
         return boardString;
     }
@@ -201,7 +217,7 @@ public class Board {
             for (String string : strings) {
                 newBoardString = newBoardString.concat(EMPTY_SPACE + string + EMPTY_SPACE);
             }
-            newBoardString = newBoardString.concat("\n");
+            newBoardString = newBoardString.concat(LINE_BREAK);
         }
         return newBoardString;
     }
@@ -214,7 +230,7 @@ public class Board {
     //update the defender board
     public String hit(Position position) {
 
-        if(!listOfPreviousAttacks.add(position)){
+        if (!listOfPreviousAttacks.add(position)) {
             return "Same position";
         }
 
@@ -223,11 +239,11 @@ public class Board {
         }
 
         if (isShip(position)) {
-            yourBoard[position.getX()][position.getY()] = Colors.RED+BOAT_PIECE_HIT+Colors.RESET;
-            return Colors.RED+BOAT_PIECE_HIT+Colors.RESET;
+            yourBoard[position.getX()][position.getY()] = Colors.RED + BOAT_PIECE_HIT + Colors.RESET;
+            return Colors.RED + BOAT_PIECE_HIT + Colors.RESET;
         }
-        yourBoard[position.getX()][position.getY()] = Colors.BLACK_BRIGHT+WATER_HIT+Colors.RESET;
-        return Colors.BLACK_BRIGHT+WATER_HIT+Colors.RESET;
+        yourBoard[position.getX()][position.getY()] = Colors.BLACK_BRIGHT + WATER_HIT + Colors.RESET;
+        return Colors.BLACK_BRIGHT + WATER_HIT + Colors.RESET;
     }
 
     private boolean isShip(Position position) {
@@ -236,6 +252,4 @@ public class Board {
         }
         return false;
     }
-
 }
-

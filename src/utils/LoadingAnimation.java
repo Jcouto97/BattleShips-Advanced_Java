@@ -1,13 +1,13 @@
-package utils;
+/*package utils;
 
 import game.GameServer;
 
 public class LoadingAnimation {
     private String lastLine = "";
 
-    /*
+    *//*
     This method is what allows each line to reset and draw again
-     */
+     *//*
     public void print(String line, GameServer.PlayerHandler playerHandler) {
         //clear the last line if longer
         if (lastLine.length() > line.length()) {
@@ -49,4 +49,4 @@ public class LoadingAnimation {
         }
         return "You were too slow! The AI randomly attacked coordinates # #!";
     }
-}
+}*/

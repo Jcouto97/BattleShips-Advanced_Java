@@ -9,16 +9,16 @@ public enum Command {
     private String description;
     private CommandHandler handler;
 
-    /*
-    Chat commands
+    /**
+     *Commands used in the chat by the players.
      */
     Command(String description, CommandHandler handler){
         this.description = description;
         this.handler = handler;
     }
 
-    /*
-    Gets a command from the description given
+    /**
+     * Gets a command from the description given
      */
     public static Command getCommandFromDescription(String description) {
         for (int i = 0; i < Command.values().length; i++) {

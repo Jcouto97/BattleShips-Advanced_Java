@@ -15,6 +15,9 @@ public enum ColumnENUM {
     private final String letter;
     private final int value;
 
+    /**
+     * Enums used to draw the columns with letters
+     */
     ColumnENUM(String letter, int value) {
         this.letter = letter;
         this.value = value;
