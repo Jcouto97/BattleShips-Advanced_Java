@@ -2,6 +2,7 @@ package network;
 
 import commands.Command;
 import field.Board;
+import utils.LoadingAnimation;
 import utils.Utils;
 
 import java.io.*;
@@ -128,6 +129,7 @@ public class GameServer {
         private boolean loser;
         private boolean ready;
         private int maxNumberOfRandomBoards;
+        private LoadingAnimation loadingAnimation;
 
         /*
         Constructor that receives a name and a playerSocket
@@ -150,6 +152,7 @@ public class GameServer {
             this.lock = new Object();
             this.ready = false;
             this.maxNumberOfRandomBoards = 3;
+            this.loadingAnimation = new LoadingAnimation();
         }
 
         /*
@@ -209,6 +212,7 @@ public class GameServer {
                     while (!isAttacker) {
                         synchronized (lock) {
                             send("Waiting for adversary attack!");
+                            send(String.valueOf(loadingAnimation.animationTime(loadingAnimation, 21)));
                             lock.wait();
                         }
                     }
