@@ -21,7 +21,7 @@
 - Keep this going until one of the player has no remaining boats and wins;
 - Have fun :)!
 
-To run program, download 9 files and compile in IDE or using javac in terminal
+To run program, download 18 files and compile in IDE or using javac in terminal
 
 ## EXAMPLE OUTPUT
 
