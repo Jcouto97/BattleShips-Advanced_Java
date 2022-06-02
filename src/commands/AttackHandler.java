@@ -36,7 +36,7 @@ public class AttackHandler implements CommandHandler {
             updates defender board (changes "~" to "." or "x" depending on if it was water or a ship) (second line of if condition)
          */
         for (GameServer.PlayerHandler defender : server.getPlayerList()) {
-            if (!attacker.getName().equals(defender.getName())) {
+            if (!attacker.getName().equals(defender.getName()) && attacker.getPlayerGameId() == defender.getPlayerGameId()) {
                 String hit = defender.getPlayerBoard().hit(hitPosition); // defender gets hit by attacker
                 if (samePosition(attacker, hit)) {
                     break; // checks if is the same position
@@ -57,9 +57,14 @@ public class AttackHandler implements CommandHandler {
                 winnerAndLoser(attacker, defender); // check if there is a winner
             }
         }
+        for (int i = 0; i < server.getPlayerList().size(); i++) {
+
+        }
         for (GameServer.PlayerHandler players : server.getPlayerList()) {
-            synchronized (players.getLock()) {
-                players.getLock().notifyAll();
+            if (attacker.getPlayerGameId() == players.getPlayerGameId()){
+                synchronized (players.getLock()) {
+                    players.getLock().notifyAll();
+                }
             }
         }
     }
@@ -150,10 +155,9 @@ public class AttackHandler implements CommandHandler {
      */
     private void winnerAndLoser(GameServer.PlayerHandler attacker, GameServer.PlayerHandler defender) {
         if (!defender.checkIfTheresShipsAlive()) {
-            defender.setLoser();
+            defender.loser();
             reDrawPlayerBoards(attacker);
-            defender.send("You Lost");
-            attacker.send("You Win");
+            defender.send("You Lose");
             defender.close();
             attacker.close();
         }

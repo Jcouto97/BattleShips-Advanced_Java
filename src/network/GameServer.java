@@ -18,15 +18,22 @@ public class GameServer {
     private ServerSocket serverSocket;
     private ExecutorService service;
     private List<PlayerHandler> playerList;
-    private boolean isWaiting = false;
-    private final Object lock2 = new Object();
+    private boolean isWaiting;
+    private final Object lock2;
+    private int gameIds;
+
+    public GameServer() {
+        this.gameIds = 1;
+        this.lock2 = new Object();
+        isWaiting = false;
+    }
 
     /*
-    Starts server with port as a parameter;
-    Starts a thread pool with unlimited thread space;
-    Starts a new list were players will be added;
-    Adds number of connections of players to the server;
-     */
+        Starts server with port as a parameter;
+        Starts a thread pool with unlimited thread space;
+        Starts a new list were players will be added;
+        Adds number of connections of players to the server;
+         */
     public void start(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
@@ -53,24 +60,35 @@ public class GameServer {
             synchronized (lock2) {
                 lock2.notifyAll();
             }
-            playerList.get((int) Math.floor(Math.random() * 2)).isAttacker = true;
-            for (PlayerHandler playerHandler : playerList) {
-                synchronized (playerHandler.lock) {
-                    playerHandler.lock.notifyAll();
-                }
-            }
+            chooseAttacker();
+            gameIds++;
+//            for (PlayerHandler playerHandler : playerList) {
+//                synchronized (playerHandler.lock) {
+//                    playerHandler.lock.notifyAll();
+//                }
+//            }
             return;
         }
         synchronized (lock2) {
             try {
                 player.send("Waiting for adversary to connect!");
-               isWaiting = true;
+                isWaiting = true;
                 lock2.wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             isWaiting = false;
         }
+    }
+
+    private void chooseAttacker() {
+        List<Integer> players = new ArrayList<>();
+        for (int i = 0; i < playerList.size(); i++) {
+            if (playerList.get(i).playerGameId == gameIds) {
+                players.add(i);
+            }
+        }
+        playerList.get(players.get((int) Math.floor(Math.random() * 2))).isAttacker = true;
     }
 
     /*
@@ -131,6 +149,7 @@ public class GameServer {
         private boolean ready;
         private int maxNumberOfRandomBoards;
         private LoadingAnimation loadingAnimation;
+        private int playerGameId;
 
         /*
         Constructor that receives a name and a playerSocket
@@ -189,9 +208,39 @@ public class GameServer {
         */
         @Override
         public void run() {
-
             startScreen();
+            readyCheck();
+            playerGameId = gameIds;
+            waitingRoom(this); //1st player will wait for the 2nd to start the game
+            play();
+        }
 
+        private void play() {
+            while (!playerSocket.isClosed()) {
+                try {
+                    send(board.getYourBoard());
+                    send(board.getAdversaryBoard());
+                    while (!isAttacker) {
+                        synchronized (lock) {
+                            send("Waiting for adversary attack!");
+                            lock.wait();
+                        }
+                    }
+                    send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
+                    this.message = reader.readLine();//o que vem do player //blocking method
+                    if (isCommand(message)) {
+                        dealWithCommand(message);
+                    } else if (!isCommand(message)) {
+                        send("Not a command, try again!");
+                    }
+                } catch (IOException | InterruptedException e) {
+                    loser();
+                    close();
+                }
+            }
+        }
+
+        private void readyCheck() {
             while (!ready) {
                 try {
                     send(board.getYourBoard()); //mostra primeiro a board e depois se queres ready ou random
@@ -201,36 +250,20 @@ public class GameServer {
                         dealWithCommand(message);
                     }
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            waitingRoom(this); //1st player will wait for the 2nd to start the game
-            while (!playerSocket.isClosed()) {
-                try {
-                    send(board.getYourBoard());
-                    send(board.getAdversaryBoard());
-
-                    while (!isAttacker) {
-                        synchronized (lock) {
-                            send("Waiting for adversary attack!");
-                            send(String.valueOf(loadingAnimation.animationTime(loadingAnimation, 21)));
-                            lock.wait();
-                        }
-                    }
-                    send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
-
-                    this.message = reader.readLine();//o que vem do player //blocking method
-                    if (isCommand(message)) {
-                        dealWithCommand(message);
-                    } else if (!isCommand(message)) {
-                        send("Not a command, try again!");
-                    }
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
+                    close();
                 }
             }
         }
 
+        public void loser() {
+            for (PlayerHandler players : playerList) {
+                if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
+                    this.setLoser();
+                    players.send("You Win");
+                    players.close();
+                }
+            }
+        }
 
         /*
         Uses Ascci art from Utils class to make starting menu
@@ -241,7 +274,7 @@ public class GameServer {
             try {
                 this.message = reader.readLine();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                close();
             }
         }
 
@@ -325,6 +358,10 @@ public class GameServer {
 
         public void setMaxNumberOfRandomBoards(int maxNumberOfRandomBoards) {
             this.maxNumberOfRandomBoards = maxNumberOfRandomBoards;
+        }
+
+        public int getPlayerGameId() {
+            return playerGameId;
         }
     }
 }
