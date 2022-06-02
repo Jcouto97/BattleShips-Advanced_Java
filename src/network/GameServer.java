@@ -18,7 +18,7 @@ public class GameServer {
     private ServerSocket serverSocket;
     private ExecutorService service;
     private List<PlayerHandler> playerList;
-    private int increment = 0;
+    private boolean isWaiting = false;
     private final Object lock2 = new Object();
 
     /*
@@ -49,7 +49,7 @@ public class GameServer {
     Then it will notifyAll() threads to start game
      */
     private void waitingRoom(PlayerHandler player) {
-        if (increment == 2) {
+        if (isWaiting) {
             synchronized (lock2) {
                 lock2.notifyAll();
             }
@@ -64,10 +64,12 @@ public class GameServer {
         synchronized (lock2) {
             try {
                 player.send("Waiting for adversary to connect!");
+               isWaiting = true;
                 lock2.wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            isWaiting = false;
         }
     }
 
@@ -191,9 +193,7 @@ public class GameServer {
             startScreen();
 
             while (!ready) {
-
                 try {
-
                     send(board.getYourBoard()); //mostra primeiro a board e depois se queres ready ou random
                     send("Write /ready to start the game!\nWrite /random for a new board!\nNumber of random boards you can still generate: " + this.maxNumberOfRandomBoards);
                     this.message = reader.readLine();
@@ -204,7 +204,6 @@ public class GameServer {
                     throw new RuntimeException(e);
                 }
             }
-            increment++;
             waitingRoom(this); //1st player will wait for the 2nd to start the game
             while (!playerSocket.isClosed()) {
                 try {

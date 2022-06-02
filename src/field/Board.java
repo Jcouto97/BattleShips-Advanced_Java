@@ -32,7 +32,6 @@ public class Board {
     private List<Ship> allTheShips;
 
     private final Set<Position> listOfPreviousAttacks = new HashSet<>();
-    private final ColumnENUM[] columnENUM;
 
 
     /*
@@ -50,7 +49,6 @@ public class Board {
         drawNumbersAndWater(numberOfRows, numberOfCols);
         cloneBoard();
         addShip();
-        columnENUM = ColumnENUM.values();
     }
 
     /*
