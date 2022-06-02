@@ -7,6 +7,8 @@ import gameobjects.Ship;
 import gameobjects.ShipsENUM;
 import game.GameServer;
 
+import static utils.asciiArt.LOSER;
+
 
 public class AttackHandler implements CommandHandler {
 
@@ -152,7 +154,7 @@ public class AttackHandler implements CommandHandler {
         if (!defender.checkIfTheresShipsAlive()) {
             defender.setLoser();
             reDrawPlayerBoards(attacker);
-            defender.send("You Lost");
+            defender.send("You Lost" + "\n\n" + LOSER);
             attacker.send("You Win");
             defender.close();
             attacker.close();
