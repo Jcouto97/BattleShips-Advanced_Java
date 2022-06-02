@@ -25,7 +25,7 @@ To run program, download 9 files and compile in IDE or using javac in terminal
 
 ## EXAMPLE OUTPUT
 
-![Screenshot 2022-06-02 163801](https://user-images.githubusercontent.com/103672168/171674280-5b5d4af9-3173-47c5-b3ff-274f2a561beb.png)
+![Screenshot 2022-06-02 163801](https://user-images.githubusercontent.com/103672168/171674503-8bb2a5f7-1402-4c07-833d-7c1a709ea338.png)
 
 
 
