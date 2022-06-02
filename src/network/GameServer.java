@@ -129,6 +129,7 @@ public class GameServer {
         private boolean loser;
         private boolean ready;
         private int maxNumberOfRandomBoards;
+        private LoadingAnimation loadingAnimation;
 
         /*
         Constructor that receives a name and a playerSocket
