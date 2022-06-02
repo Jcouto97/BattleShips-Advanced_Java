@@ -25,7 +25,7 @@ To run program, download 9 files and compile in IDE or using javac in terminal
 
 ## EXAMPLE OUTPUT
 
-<img width="405" alt="screen shot 02-06-2022 at 16 38 pm" src="C:\Users\jon\Desktop\New folder\Screenshot 2022-06-02 163801.png">
+![Screenshot 2022-06-02 163801](https://user-images.githubusercontent.com/103672168/171674280-5b5d4af9-3173-47c5-b3ff-274f2a561beb.png)
 
 
 
