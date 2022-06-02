@@ -1,4 +1,4 @@
-package network;
+package game;
 
 import colors.Colors;
 import commands.Command;
@@ -9,7 +9,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -220,7 +219,7 @@ public class GameServer {
                         }
                     }
                     send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
-                    send(loadingAnimation.animationTime(loadingAnimation, 20, this));
+                    //send(loadingAnimation.animationTime(loadingAnimation, 20, this));
 
 
                     this.message = reader.readLine();//o que vem do player //blocking method

@@ -5,7 +5,7 @@ import field.ColumnENUM;
 import field.Position;
 import gameobjects.Ship;
 import gameobjects.ShipsENUM;
-import network.GameServer;
+import game.GameServer;
 
 
 public class AttackHandler implements CommandHandler {

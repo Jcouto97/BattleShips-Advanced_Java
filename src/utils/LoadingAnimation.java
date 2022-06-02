@@ -1,6 +1,6 @@
 package utils;
 
-import network.GameServer;
+import game.GameServer;
 
 public class LoadingAnimation {
     private String lastLine = "";
