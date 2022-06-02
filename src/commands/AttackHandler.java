@@ -149,7 +149,6 @@ public class AttackHandler implements CommandHandler {
      */
     private void winnerAndLoser(GameServer.PlayerHandler attacker, GameServer.PlayerHandler defender) {
         if (!defender.checkIfTheresShipsAlive()) {
-            defender.loser();
             reDrawPlayerBoards(attacker);
             defender.send("\n\n" + LOSER);
             attacker.send("\n\n" + WINNER);
