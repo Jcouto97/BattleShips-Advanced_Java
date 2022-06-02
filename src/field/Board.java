@@ -25,7 +25,7 @@ public class Board {
     private final String[][] enemyBoard;
     private final int[] allShipSizes;
     private List<Ship> allTheShips;
-    private final Set<Position> listOfPreviousAttacks = new HashSet<>();
+    private final Set<Position> listOfPreviousAttacks;
 
     /**
      * Constructs the attackers and defenders board;
@@ -33,10 +33,11 @@ public class Board {
      * Adds ships to attackers board.
      */
     public Board() {
-        allShipSizes = new int[]{2};
-        allTheShips = new ArrayList<>();
+        this.allShipSizes = new int[]{2,3,3,4,5};
+        this.allTheShips = new ArrayList<>();
         this.yourBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
         this.enemyBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
+        this.listOfPreviousAttacks = new HashSet<>();
         int numberOfRows = 1;
         int numberOfCols = 1;
         drawBoardLayout(numberOfRows, numberOfCols);
