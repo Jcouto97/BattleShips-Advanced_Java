@@ -5,13 +5,13 @@ import commands.Command;
 import field.Board;
 import field.ColumnENUM;
 import field.Position;
-import utils.LoadingAnimation;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,6 +25,7 @@ public class GameServer {
     private boolean isWaiting;
     private final Object lock2;
     private int gameIds;
+    private Thread bot = null;
 
     public GameServer() {
         this.gameIds = 1;
@@ -37,7 +38,7 @@ public class GameServer {
         Starts a thread pool with unlimited thread space;
         Starts a new list were players will be added;
         Adds number of connections of players to the server;
-         */
+    */
     public void start(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
@@ -58,19 +59,29 @@ public class GameServer {
     Randomizes witch player starts as attacker
     If only 1 player enter it will jump to lock2.wait until 2nd player joins
     Then it will notifyAll() threads to start game
-     */
+    */
     private void waitingRoom(PlayerHandler player) {
+        if (!isWaiting) {
+            bot = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(30000);
+                        new Bot();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            });
+            bot.start();
+        }
         if (isWaiting) {
             synchronized (lock2) {
                 lock2.notifyAll();
             }
+            bot.interrupt();
             chooseAttacker();
             gameIds++;
-//            for (PlayerHandler playerHandler : playerList) {
-//                synchronized (playerHandler.lock) {
-//                    playerHandler.lock.notifyAll();
-//                }
-//            }
             return;
         }
         synchronized (lock2) {
@@ -138,7 +149,6 @@ public class GameServer {
 
     /*
     Object that stores each player info
-
      */
     public class PlayerHandler implements Runnable {
         private final String name;
@@ -153,7 +163,6 @@ public class GameServer {
         private boolean loser;
         private boolean ready;
         private int maxNumberOfRandomBoards;
-        private LoadingAnimation loadingAnimation;
         private int playerGameId;
         private boolean winner;
 
@@ -180,7 +189,6 @@ public class GameServer {
             this.messageLock = new Object();
             this.ready = false;
             this.maxNumberOfRandomBoards = 3;
-            this.loadingAnimation = new LoadingAnimation();
         }
 
         /*
@@ -226,23 +234,20 @@ public class GameServer {
         }
 
         private void play() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!playerSocket.isClosed()) {
+            new Thread(() -> {
+                while (!playerSocket.isClosed()) {
+                    try {
+
+                        message = reader.readLine();
+                        synchronized (messageLock) {
+                            messageLock.notifyAll();
+                        }
+                    } catch (IOException e) {
                         try {
+                            clientDC();
+                            close();
+                        } catch (ConcurrentModificationException j) {
 
-                            message = reader.readLine();
-                            synchronized (messageLock) {
-                                messageLock.notifyAll();
-                            }
-                        } catch (IOException e) {
-                            try {
-                                clientDC();
-                                close();
-                            } catch (ConcurrentModificationException j) {
-
-                            }
                         }
                     }
                 }
@@ -258,29 +263,7 @@ public class GameServer {
                         }
                     }
                     send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
-                    Thread waitTime = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(30000);
-                                ColumnENUM firstParameter = null;
-                                int secondParameter = 0;
-                                Position randomPosition = null;
-                                do {
-                                    firstParameter = ColumnENUM.values()[(int) Math.floor(Math.random() * (ColumnENUM.values().length-1) + 1)];
-                                    secondParameter = (int) Math.floor(Math.random() * (10-1) + 1);
-                                    randomPosition = new Position(firstParameter.getValue(), secondParameter);
-                                } while (board.getListOfPreviousAttacks().contains(randomPosition));
-                                message = "/attack "+firstParameter.getLetter()+" "+secondParameter;
-                                synchronized (messageLock) {
-                                    messageLock.notifyAll();
-                                }
-                            } catch (InterruptedException e) {
-                            }
-                        }
-                    });
-                    waitTime.start();
+                    Thread waitTime = timer();
                     synchronized (messageLock) {
                         messageLock.wait();
                     }
@@ -295,6 +278,42 @@ public class GameServer {
 
                 }
             }
+        }
+
+        private Thread timer() {
+            ColumnENUM firstParameter;
+            int secondParameter;
+            Position randomPosition;
+            boolean exists;
+            do {
+                exists = false;
+                firstParameter = ColumnENUM.values()[(int) Math.floor(Math.random() * (ColumnENUM.values().length - 1) + 1)];
+                secondParameter = (int) Math.floor(Math.random() * (10 - 1) + 1);
+                randomPosition = new Position(firstParameter.getValue(), secondParameter);
+                for (PlayerHandler playerHandler : playerList) {
+                    if (playerHandler.playerGameId == this.playerGameId && !playerHandler.name.equals(this.name)) {
+                        if (playerHandler.board.getListOfPreviousAttacks().contains(randomPosition)) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+            } while (exists);
+
+            ColumnENUM finalFirstParameter = firstParameter;
+            int finalSecondParameter = secondParameter;
+            Thread waitTime = new Thread(() -> {
+                try {
+                    Thread.sleep(30000);
+                    message = "/attack " + finalFirstParameter.getLetter() + " " + finalSecondParameter;
+                    synchronized (messageLock) {
+                        messageLock.notifyAll();
+                    }
+                } catch (InterruptedException ignored) {
+                }
+            });
+            waitTime.start();
+            return waitTime;
         }
 
         private void readyCheck() {
@@ -315,12 +334,14 @@ public class GameServer {
         public void clientDC() throws ConcurrentModificationException {
             for (PlayerHandler players : playerList) {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
-                    players.send("\n\n" + WINNER);;
+                    players.send("\n\n" + WINNER);
+                    ;
                     players.winner = true;
                     players.close();
                 }
             }
         }
+
         /*
         Uses Ascci art from Utils class to make starting menu
          */
@@ -328,11 +349,11 @@ public class GameServer {
             String[] a = BATTLESHIP.split("");
             String b = "";
             for (String s : a) {
-                if(s.equals("$")){
-                    b += Colors.RED+s;
+                if (s.equals("$")) {
+                    b += Colors.RED + s;
                     continue;
                 }
-                b += Colors.BLUE+s;
+                b += Colors.BLUE + s;
             }
 
 
