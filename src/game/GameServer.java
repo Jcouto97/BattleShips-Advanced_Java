@@ -5,8 +5,6 @@ import commands.Command;
 import field.Board;
 import field.ColumnENUM;
 import field.Position;
-import utils.LoadingAnimation;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -32,12 +30,13 @@ public class GameServer {
         isWaiting = false;
     }
 
+
     /*
         Starts server with port as a parameter;
         Starts a thread pool with unlimited thread space;
         Starts a new list were players will be added;
         Adds number of connections of players to the server;
-         */
+    */
     public void start(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
@@ -58,7 +57,7 @@ public class GameServer {
     Randomizes witch player starts as attacker
     If only 1 player enter it will jump to lock2.wait until 2nd player joins
     Then it will notifyAll() threads to start game
-     */
+    */
     private void waitingRoom(PlayerHandler player) {
         if (isWaiting) {
             synchronized (lock2) {
@@ -138,7 +137,6 @@ public class GameServer {
 
     /*
     Object that stores each player info
-
      */
     public class PlayerHandler implements Runnable {
         private final String name;
@@ -153,7 +151,6 @@ public class GameServer {
         private boolean loser;
         private boolean ready;
         private int maxNumberOfRandomBoards;
-        private LoadingAnimation loadingAnimation;
         private int playerGameId;
         private boolean winner;
 
@@ -180,7 +177,6 @@ public class GameServer {
             this.messageLock = new Object();
             this.ready = false;
             this.maxNumberOfRandomBoards = 3;
-            this.loadingAnimation = new LoadingAnimation();
         }
 
         /*
@@ -226,23 +222,20 @@ public class GameServer {
         }
 
         private void play() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!playerSocket.isClosed()) {
+            new Thread(() -> {
+                while (!playerSocket.isClosed()) {
+                    try {
+
+                        message = reader.readLine();
+                        synchronized (messageLock) {
+                            messageLock.notifyAll();
+                        }
+                    } catch (IOException e) {
                         try {
+                            clientDC();
+                            close();
+                        } catch (ConcurrentModificationException j) {
 
-                            message = reader.readLine();
-                            synchronized (messageLock) {
-                                messageLock.notifyAll();
-                            }
-                        } catch (IOException e) {
-                            try {
-                                clientDC();
-                                close();
-                            } catch (ConcurrentModificationException j) {
-
-                            }
                         }
                     }
                 }
@@ -258,26 +251,22 @@ public class GameServer {
                         }
                     }
                     send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
-                    Thread waitTime = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(30000);
-                                ColumnENUM firstParameter = null;
-                                int secondParameter = 0;
-                                Position randomPosition = null;
-                                do {
-                                    firstParameter = ColumnENUM.values()[(int) Math.floor(Math.random() * (ColumnENUM.values().length-1) + 1)];
-                                    secondParameter = (int) Math.floor(Math.random() * (10-1) + 1);
-                                    randomPosition = new Position(firstParameter.getValue(), secondParameter);
-                                } while (board.getListOfPreviousAttacks().contains(randomPosition));
-                                message = "/attack "+firstParameter.getLetter()+" "+secondParameter;
-                                synchronized (messageLock) {
-                                    messageLock.notifyAll();
-                                }
-                            } catch (InterruptedException e) {
+                    Thread waitTime = new Thread(() -> {
+                        try {
+                            Thread.sleep(30000);
+                            ColumnENUM firstParameter = null;
+                            int secondParameter = 0;
+                            Position randomPosition = null;
+                            do {
+                                firstParameter = ColumnENUM.values()[(int) Math.floor(Math.random() * (ColumnENUM.values().length-1) + 1)];
+                                secondParameter = (int) Math.floor(Math.random() * (10-1) + 1);
+                                randomPosition = new Position(firstParameter.getValue(), secondParameter);
+                            } while (board.getListOfPreviousAttacks().contains(randomPosition));
+                            message = "/attack "+firstParameter.getLetter()+" "+secondParameter;
+                            synchronized (messageLock) {
+                                messageLock.notifyAll();
                             }
+                        } catch (InterruptedException e) {
                         }
                     });
                     waitTime.start();
