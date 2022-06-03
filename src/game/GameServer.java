@@ -71,7 +71,6 @@ public class GameServer {
      * First player creates bot, goes to synchronize and waits for second person that jumps to second if,
      * notifies all and interrupts bot
      * Lock object used for player to wait a notifyAll
-     * @param player
      */
     private void waitingRoom(PlayerHandler player) {
         if (!isWaiting) {
@@ -133,7 +132,6 @@ public class GameServer {
 
     /**
      * Function used to remove player from list when close() or quit (command) and game ends
-     * @param name
      */
     public void removePlayers(String name) {
         for (int i = 0; i < playerList.size(); i++) {
@@ -393,7 +391,6 @@ public class GameServer {
         /**
          * Checks if a player disconnects;
          * Makes other player winner;
-         * @throws ConcurrentModificationException
          */
         public void clientDisconnect() throws ConcurrentModificationException {
             for (PlayerHandler players : playerList) {
@@ -410,13 +407,13 @@ public class GameServer {
          */
         private void startScreen() {
             String[] a = BATTLESHIP.split("");
-            String b = "";
+            StringBuilder b = new StringBuilder();
             for (String s : a) {
                 if (s.equals("$")) {
-                    b += Colors.RED + s;
+                    b.append(Colors.RED).append(s);
                     continue;
                 }
-                b += Colors.BLUE + s;
+                b.append(Colors.BLUE).append(s);
             }
 
 
@@ -458,7 +455,7 @@ public class GameServer {
                 writer.write(message);
                 writer.newLine();
                 writer.flush();
-            } catch (IOException e) {
+            } catch (IOException ignored) {
 
             }
         }
