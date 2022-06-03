@@ -130,6 +130,8 @@ public class GameServer {
         private boolean ready;
         private int maxNumberOfRandomBoards;
         private LoadingAnimation loadingAnimation;
+        private boolean isPlayerTyping;
+
 
         /*
         Constructor that receives a name and a playerSocket
@@ -153,6 +155,7 @@ public class GameServer {
             this.ready = false;
             this.maxNumberOfRandomBoards = 3;
             this.loadingAnimation = new LoadingAnimation();
+            this.isPlayerTyping = false;
         }
 
         /*
@@ -179,13 +182,28 @@ public class GameServer {
             isAttacker = attacker;
         }
 
+        public boolean isPlayerTyping() {
+            try {
+                if (this.reader.ready()) {
+                    return true;
+                }
+                return false;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void setPlayerTyping(boolean playerTyping) {
+            isPlayerTyping = playerTyping;
+        }
+
         /*
-        Thread that reads players messages
-        Shows players boards
-        Deals with commands (Attack, ready, random, quit)
-        After first player decides to ready or random he will be sent to the wanting room to wait 2nd player
-        If not attacker, player will wait for attacker to attack (using synchronize)
-        */
+                Thread that reads players messages
+                Shows players boards
+                Deals with commands (Attack, ready, random, quit)
+                After first player decides to ready or random he will be sent to the wanting room to wait 2nd player
+                If not attacker, player will wait for attacker to attack (using synchronize)
+                */
         @Override
         public void run() {
 
@@ -219,7 +237,7 @@ public class GameServer {
                         }
                     }
                     send("You are attacking, write /attack and choose your coordinates!\nFormat for coordinates is '# #', example: 'B 4'");
-                    //send(loadingAnimation.animationTime(loadingAnimation, 20, this));
+                    send(loadingAnimation.animationTime(loadingAnimation, 20, this));
 
 
                     this.message = reader.readLine();//o que vem do player //blocking method

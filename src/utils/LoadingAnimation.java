@@ -16,8 +16,7 @@ public class LoadingAnimation {
                 temp += " ";
             }
         }
-        playerHandler.send(line);
-
+        playerHandler.send("specialCode " + line);
         lastLine = line;
     }
 
@@ -40,6 +39,10 @@ public class LoadingAnimation {
 
     public String animationTime(LoadingAnimation loadingAnimation, int time, GameServer.PlayerHandler playerHandler) {
         for (int i = time; i >= 0; i--) {
+            if(playerHandler.isPlayerTyping()) {
+                //playerHandler.run();
+
+            }
             loadingAnimation.animate("You have " + i + " seconds left to attack",playerHandler);
             try {
                 Thread.sleep(1000);
