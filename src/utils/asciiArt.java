@@ -23,8 +23,8 @@ public class asciiArt {
             "\t\t\t                                         |\n" +
                     "\t\t\t                  |                      |\n" +
                     "\t\t\t                  |                    -/_\\-\n" +
-                    "\t\t\t                -/_\\-   ______________(/ . \\)______________\n" +
-                    "\t\t\t   ____________(/ . \\)_____________    \\___/" + Colors.RED + "     <>\n" + Colors.RESET +
+                    "\t\t\t                -/_\\-   ______________(/ C \\)______________\n" +
+                    "\t\t\t   ____________(/ D \\)_____________    \\___/" + Colors.RED + "     <>\n" + Colors.RESET +
                     "\t\t\t   " + Colors.RED + "<>" + Colors.RESET + "           \\___/" + Colors.RED + "     <>    <>\n" + Colors.RESET +
                     "\t\t" + Colors.WHITE + " swoosh" + Colors.RESET + Colors.MAGENTA + "                                                   ||        \n" + Colors.RESET +
                     "\t\t\t" + Colors.MAGENTA + "      ||" + Colors.RESET + Colors.WHITE + "                           " + Colors.RESET + Colors.GREEN + "|\\                 " + Colors.RESET + Colors.RED + "<>" + Colors.RESET + Colors.WHITE + "   BIG BOOM\n" + Colors.RESET +
