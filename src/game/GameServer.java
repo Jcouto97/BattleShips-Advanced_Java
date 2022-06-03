@@ -11,7 +11,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +26,11 @@ public class GameServer {
     private int gameIds;
     private Thread bot = null;
 
+    /**
+     * Constructor that initializes each game with an ID
+     * Creates lock object for thread handling
+     * isWaiting boolean to false
+     */
     public GameServer() {
         this.gameIds = 1;
         this.lock2 = new Object();
@@ -39,6 +43,14 @@ public class GameServer {
         Starts a new list were players will be added;
         Adds number of connections of players to the server;
     */
+
+    /**
+     * Starts server with port as a parameter;
+     * Starts a thread pool with unlimited thread space;
+     * Starts a new list were players will be added;
+     * Adds number of connections of players to the server;
+     * @param port -> server port
+     */
     public void start(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
@@ -55,25 +67,15 @@ public class GameServer {
         }
     }
 
-    /*
-    Randomizes witch player starts as attacker
-    If only 1 player enter it will jump to lock2.wait until 2nd player joins
-    Then it will notifyAll() threads to start game
-    */
+    /**
+     * Randomizes witch player starts as attacker
+     * If only 1 player enter it will jump to lock2.wait until 2nd player joins
+     * Then it will notifyAll() threads to start game
+     * @param player
+     */
     private void waitingRoom(PlayerHandler player) {
         if (!isWaiting) {
-            bot = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(30000);
-                        new Bot();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            });
-            bot.start();
+            bot();
         }
         if (isWaiting) {
             synchronized (lock2) {
@@ -96,18 +98,42 @@ public class GameServer {
         }
     }
 
+    /**
+     * Bot will deploy after 30 seconds if the second player doesn't connect
+     */
+
+    private void bot() {
+        bot = new Thread(() -> {
+            try {
+                Thread.sleep(30000);
+                new Bot();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        bot.start();
+    }
+
+    /**
+     * Created new list to place the two players of this game
+     * Randomize between the players who starts attacking
+     */
     private void chooseAttacker() {
         List<Integer> players = new ArrayList<>();
         for (int i = 0; i < playerList.size(); i++) {
             if (playerList.get(i).playerGameId == gameIds) {
                 players.add(i);
+                if(players.size()==2){
+                    break;
+                }
             }
         }
         playerList.get(players.get((int) Math.floor(Math.random() * 2))).isAttacker = true;
     }
 
-    /*
-    Function used to remove player from list when quit (command)
+    /**
+     * Function used to remove player from list when close() or quit (command) and game ends
+     * @param name
      */
     public void removePlayers(String name) {
         for (int i = 0; i < playerList.size(); i++) {
@@ -118,10 +144,11 @@ public class GameServer {
         }
     }
 
-    /*
-    Server socket accepts the players socket;
-    Created new Player with name (using numOfConnections) and his socket;
-    Invoke addPlayer function (below) on this new PlayerHandler instance;
+    /**
+     * Server socket accepts the players socket;
+     * Created new Player with name (using numOfConnections) and his socket;
+     * Invoke addPlayer function (below) on this new PlayerHandler instance;
+     * @param numberOfConnections give unique id to the player
      */
     public void acceptConnection(int numberOfConnections) {
         try {
@@ -132,10 +159,11 @@ public class GameServer {
         }
     }
 
-    /*
-    The new PlayerHandler instance will be added to the player list;
-    It's runnable will be submitted to the thread pool
-    */
+    /**
+     * The new PlayerHandler instance will be added to the player list;
+     * It's runnable will be submitted to the thread pool
+     * @param player receives a playerHandler
+     */
     public void addPlayer(PlayerHandler player) {
         playerList.add(player);
         service.submit(player);
@@ -146,9 +174,8 @@ public class GameServer {
         return playerList;
     }
 
-
-    /*
-    Object that stores each player info
+    /**
+     * Object that stores each player info
      */
     public class PlayerHandler implements Runnable {
         private final String name;
@@ -166,15 +193,18 @@ public class GameServer {
         private int playerGameId;
         private boolean winner;
 
-        /*
-        Constructor that receives a name and a playerSocket
-        Initializes:
-        -A board
-        -BufferedWriter + Reader
-        -isAttacker (to check player that attacks)
-        -Looser (check winner)
-        -Lock (object used to synchronize and wait switch between turns
-        -Ready (to check if players are ready to start)
+        /**
+         *  Constructor that receives a name and a playerSocket
+         *  Initializes:
+         *  -A board
+         *  -BufferedWriter + Reader
+         *  -isAttacker (to check player that attacks)
+         *  -Looser (check winner)
+         *  -Lock (object used to synchronize and wait switch between turns
+         *  -Ready (to check if players are ready to start)
+         * @param name receives a players name
+         * @param playerSocket receives a players socket
+         * @throws IOException throws exception if something goes wrong
          */
         public PlayerHandler(String name, Socket playerSocket) throws IOException {
             this.name = name;
@@ -191,8 +221,9 @@ public class GameServer {
             this.maxNumberOfRandomBoards = 3;
         }
 
-        /*
-        Checks if any of the player ship is alive
+        /**
+         * Checks if any of the player ship is alive
+         * @return boolean
          */
         public boolean checkIfTheresShipsAlive() {
             for (int i = 0; i < board.getAllTheShips().size(); i++) {
@@ -222,6 +253,12 @@ public class GameServer {
         After first player decides to ready or random he will be sent to the wanting room to wait 2nd player
         If not attacker, player will wait for attacker to attack (using synchronize)
         */
+
+        /**
+         * Calls startScreen;
+         * Checks if players are ready;
+         * Play();
+         */
         @Override
         public void run() {
             startScreen();
@@ -342,8 +379,8 @@ public class GameServer {
             }
         }
 
-        /*
-        Uses Ascci art from Utils class to make starting menu
+        /**
+         * Uses Ascci art from Utils class to make starting menu
          */
         private void startScreen() {
             String[] a = BATTLESHIP.split("");
