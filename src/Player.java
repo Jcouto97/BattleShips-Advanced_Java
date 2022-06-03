@@ -5,10 +5,8 @@ import java.net.Socket;
  * This class will create players
  */
 public class Player {
-
     public Player() {
     }
-
 
     /**
      * This method establishes a connections between the player and the server by creating a server socket
@@ -22,7 +20,6 @@ public class Player {
         Socket socket = new Socket(host, port); //criar thread (cada vez que um player se connecta, cria uma nova)
         new Thread(new KeyboardHandler(socket)).start(); //iniciar thread
     }
-
 
     /**
      *  Connecting the player to a server

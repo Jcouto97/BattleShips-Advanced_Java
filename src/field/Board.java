@@ -62,7 +62,7 @@ public class Board {
      */
 
     /**
-     * This method draws the attackers board rows, columns, and content in between
+     * This method draws the attackers board rows, columns, and content in between.
      *
      * @param numberOfRows This parameter receives the max number of rows
      * @param numberOfCols This parameter receives the max number of columns

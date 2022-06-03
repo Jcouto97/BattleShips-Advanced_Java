@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 /**
- * Class bot is used has placeholder player
+ * Class bot is used as a placeholder for the player
  *
  */
 public class Bot implements Runnable {
@@ -30,7 +30,7 @@ public class Bot implements Runnable {
     public void run() {
         try {
             for (int i = 0; i < 2; i++) {
-                Thread.sleep(1000);
+                Thread.sleep(500);
                 writer.write("/ready\n");
                 writer.newLine();
                 writer.flush();

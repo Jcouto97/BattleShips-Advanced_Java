@@ -293,6 +293,11 @@ public class GameServer {
                         messageLock.wait();
                     }
                     waitTime.interrupt();//
+                    waitTime.interrupt();
+                    if(message.contains("/random")){
+                        continue;
+                    }
+                    //o que vem do player //blocking method
                     if (isCommand(message)) {
                         dealWithCommand(message);
                         continue;
