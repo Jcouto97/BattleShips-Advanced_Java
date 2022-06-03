@@ -5,7 +5,6 @@ import commands.Command;
 import field.Board;
 import field.ColumnENUM;
 import field.Position;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -36,13 +35,6 @@ public class GameServer {
         this.lock2 = new Object();
         isWaiting = false;
     }
-
-    /*
-        Starts server with port as a parameter;
-        Starts a thread pool with unlimited thread space;
-        Starts a new list were players will be added;
-        Adds number of connections of players to the server;
-    */
 
     /**
      * Starts server with port as a parameter;

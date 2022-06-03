@@ -3,7 +3,6 @@ package field;
 import colors.Colors;
 import gameobjects.Ship;
 import gameobjects.ShipsENUM;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -56,10 +55,6 @@ public class Board {
             }
         }
     }
-
-    /*
-    Draw the attackers board with rows and columns, and filled with water "~"
-     */
 
     /**
      * This method draws the attackers board rows, columns, and content in between.
@@ -146,11 +141,6 @@ public class Board {
         }
         return true;
     }
-
-    // check if ship is on top of another and there is no ship around the new ship
-    /*
-
-     */
 
     /**
      * This method checks if a ship is over another, and also if there are no ships around it by 1 position in every direction

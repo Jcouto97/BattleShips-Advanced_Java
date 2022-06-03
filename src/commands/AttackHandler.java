@@ -156,9 +156,6 @@ public class AttackHandler implements CommandHandler {
         }
         reDrawPlayerBoards(defender);
     }
-    /*
-    Checks if there is a winner
-     */
 
     /**
      * If defenders boats are all dead define winner and looser
