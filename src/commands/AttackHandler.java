@@ -25,6 +25,9 @@ public class AttackHandler implements CommandHandler {
     @Override
     public void command(GameServer.PlayerHandler attacker, GameServer server) {
         String[] coordinates = attacker.getMessage().split(" ");
+        if(coordinates.length==1){
+            return;
+        }
         int columnEnumIndex = isEnum(coordinates[1].toUpperCase());
         if (columnEnumIndex == -1 || !isInt(coordinates[2])) {
             return;

@@ -49,6 +49,7 @@ public class GameServer {
      * Starts a thread pool with unlimited thread space;
      * Starts a new list were players will be added;
      * Adds number of connections of players to the server;
+     *
      * @param port -> server port
      */
     public void start(int port) {
@@ -71,6 +72,7 @@ public class GameServer {
      * Randomizes witch player starts as attacker
      * If only 1 player enter it will jump to lock2.wait until 2nd player joins
      * Then it will notifyAll() threads to start game
+     *
      * @param player
      */
     private void waitingRoom(PlayerHandler player) {
@@ -123,7 +125,7 @@ public class GameServer {
         for (int i = 0; i < playerList.size(); i++) {
             if (playerList.get(i).playerGameId == gameIds) {
                 players.add(i);
-                if(players.size()==2){
+                if (players.size() == 2) {
                     break;
                 }
             }
@@ -133,6 +135,7 @@ public class GameServer {
 
     /**
      * Function used to remove player from list when close() or quit (command) and game ends
+     *
      * @param name
      */
     public void removePlayers(String name) {
@@ -148,6 +151,7 @@ public class GameServer {
      * Server socket accepts the players socket;
      * Created new Player with name (using numOfConnections) and his socket;
      * Invoke addPlayer function (below) on this new PlayerHandler instance;
+     *
      * @param numberOfConnections give unique id to the player
      */
     public void acceptConnection(int numberOfConnections) {
@@ -162,6 +166,7 @@ public class GameServer {
     /**
      * The new PlayerHandler instance will be added to the player list;
      * It's runnable will be submitted to the thread pool
+     *
      * @param player receives a playerHandler
      */
     public void addPlayer(PlayerHandler player) {
@@ -194,15 +199,16 @@ public class GameServer {
         private boolean winner;
 
         /**
-         *  Constructor that receives a name and a playerSocket
-         *  Initializes:
-         *  -A board
-         *  -BufferedWriter + Reader
-         *  -isAttacker (to check player that attacks)
-         *  -Looser (check winner)
-         *  -Lock (object used to synchronize and wait switch between turns
-         *  -Ready (to check if players are ready to start)
-         * @param name receives a players name
+         * Constructor that receives a name and a playerSocket
+         * Initializes:
+         * -A board
+         * -BufferedWriter + Reader
+         * -isAttacker (to check player that attacks)
+         * -Looser (check winner)
+         * -Lock (object used to synchronize and wait switch between turns
+         * -Ready (to check if players are ready to start)
+         *
+         * @param name         receives a players name
          * @param playerSocket receives a players socket
          * @throws IOException throws exception if something goes wrong
          */
@@ -223,6 +229,7 @@ public class GameServer {
 
         /**
          * Checks if any of the player ship is alive
+         *
          * @return boolean
          */
         public boolean checkIfTheresShipsAlive() {
@@ -264,10 +271,8 @@ public class GameServer {
             startScreen();
             readyCheck();
             playerGameId = gameIds;
-            while (true) {
-                waitingRoom(this); //1st player will wait for the 2nd to start the game
-                play();
-            }
+            waitingRoom(this); //1st player will wait for the 2nd to start the game
+            play();
         }
 
         private void play() {
@@ -305,6 +310,9 @@ public class GameServer {
                         messageLock.wait();
                     }
                     waitTime.interrupt();
+                    if(message.contains("/random")){
+                        continue;
+                    }
                     //o que vem do player //blocking method
                     if (isCommand(message)) {
                         dealWithCommand(message);

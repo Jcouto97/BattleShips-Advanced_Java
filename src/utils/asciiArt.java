@@ -2,8 +2,6 @@ package utils;
 
 import colors.Colors;
 
-import java.awt.*;
-
 public class asciiArt {
     public final static String BATTLESHIP =
             "\n" +
