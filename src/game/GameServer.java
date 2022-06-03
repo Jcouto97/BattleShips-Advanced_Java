@@ -68,9 +68,9 @@ public class GameServer {
     }
 
     /**
-     * Randomizes witch player starts as attacker
-     * If only 1 player enter it will jump to lock2.wait until 2nd player joins
-     * Then it will notifyAll() threads to start game
+     * First player creates bot, goes to synchronize and waits for second person that jumps to second if,
+     * notifies all and interrupts bot
+     * Lock object used for player to wait a notifyAll
      * @param player
      */
     private void waitingRoom(PlayerHandler player) {
@@ -246,17 +246,10 @@ public class GameServer {
             isAttacker = attacker;
         }
 
-        /*
-        Thread that reads players messages
-        Shows players boards
-        Deals with commands (Attack, ready, random, quit)
-        After first player decides to ready or random he will be sent to the wanting room to wait 2nd player
-        If not attacker, player will wait for attacker to attack (using synchronize)
-        */
-
         /**
          * Calls startScreen;
          * Checks if players are ready;
+         * Checks waitingRoom;
          * Play();
          */
         @Override
@@ -264,31 +257,26 @@ public class GameServer {
             startScreen();
             readyCheck();
             playerGameId = gameIds;
-            while (true) {
-                waitingRoom(this); //1st player will wait for the 2nd to start the game
-                play();
-            }
+            waitingRoom(this); //1st player will wait for the 2nd to start the game
+            play();
         }
 
+        /**
+         * Calls newMessage() and verifyMessage();
+         */
         private void play() {
-            new Thread(() -> {
-                while (!playerSocket.isClosed()) {
-                    try {
+            newMessage();
+            verifyMessage();
+        }
 
-                        message = reader.readLine();
-                        synchronized (messageLock) {
-                            messageLock.notifyAll();
-                        }
-                    } catch (IOException e) {
-                        try {
-                            clientDC();
-                            close();
-                        } catch (ConcurrentModificationException j) {
-
-                        }
-                    }
-                }
-            }).start();
+        /**
+         * Verifies which players turn to write message (with synchronizes)
+         * Sends boards to player
+         * Verifies commands
+         * Thread waits until message is sent
+         * When message is sent interrupts the wait
+         */
+        private void verifyMessage() {
             while (!playerSocket.isClosed()) {
                 try {
                     send(board.getYourBoard());
@@ -304,19 +292,42 @@ public class GameServer {
                     synchronized (messageLock) {
                         messageLock.wait();
                     }
-                    waitTime.interrupt();
-                    //o que vem do player //blocking method
+                    waitTime.interrupt();//
                     if (isCommand(message)) {
                         dealWithCommand(message);
-                    } else if (!isCommand(message)) {
-                        send("Not a command, try again!");
+                        continue;
                     }
+                    send("Not a command, try again!");
                 } catch (InterruptedException ignored) {
-
                 }
             }
         }
 
+        /**
+         * Thread that reads players messages
+         */
+        private void newMessage() {
+            new Thread(() -> {
+                while (!playerSocket.isClosed()) {
+                    try {
+                        message = reader.readLine();
+                        synchronized (messageLock) {
+                            messageLock.notifyAll();
+                        }
+                    } catch (IOException e) {
+                        try {
+                            clientDisconnect();
+                            close();
+                        } catch (ConcurrentModificationException ignored) {
+                        }
+                    }
+                }
+            }).start();
+        }
+
+        /**
+         * Timer that deploys random position if player doesn't write message
+         */
         private Thread timer() {
             ColumnENUM firstParameter;
             int secondParameter;
@@ -353,6 +364,12 @@ public class GameServer {
             return waitTime;
         }
 
+        /**
+         * While ready is false
+         * Sends player the boards
+         * Instructs player how to write commands (ready or random)
+         * Deals with command
+         */
         private void readyCheck() {
             while (!ready) {
                 try {
@@ -368,11 +385,15 @@ public class GameServer {
             }
         }
 
-        public void clientDC() throws ConcurrentModificationException {
+        /**
+         * Checks if a player disconnects;
+         * Makes other player winner;
+         * @throws ConcurrentModificationException
+         */
+        public void clientDisconnect() throws ConcurrentModificationException {
             for (PlayerHandler players : playerList) {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
                     players.send("\n\n" + WINNER);
-                    ;
                     players.winner = true;
                     players.close();
                 }
@@ -403,16 +424,17 @@ public class GameServer {
             }
         }
 
-        /*
-        Verifies if message is a command
-        */
+        /**
+         * Verifies if message is a command
+         */
         public boolean isCommand(String message) {
             return message.startsWith("/");
         }
 
-        /*
-        Deals with the command by spliting the command with coordinates
-        Execute the command, in case it exists
+
+        /**
+         * Deals with the command by spliting the command with coordinates
+         * Execute the command, in case it exists
          */
         public void dealWithCommand(String message) {
             String[] words = message.split(" ", 2);
@@ -423,8 +445,8 @@ public class GameServer {
             command.getHandler().command(this, GameServer.this);  //executar o comando
         }
 
-        /*
-        Deals with buffers
+        /**
+         * Deals with buffers
          */
         public void send(String message) {
             try {
@@ -436,8 +458,8 @@ public class GameServer {
             }
         }
 
-        /*
-        Closes player socket
+        /**
+         * Closes player socket
          */
         public void close() {
             try {
