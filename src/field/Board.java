@@ -1,12 +1,11 @@
 package field;
 
-import colors.Colors;
 import gameobjects.Ship;
 import gameobjects.ShipsENUM;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
+
+import static field.BoardSymbols.*;
 
 /**
  * Board is a class that creates game boards, it creates one for the attacker and another for the defender.
@@ -14,16 +13,11 @@ import java.util.Set;
  */
 public class Board {
     private final static int BOARD_MAX_SIZE = 10;
-    private final static String EMPTY_SPACE = " ";
-    private final static String WATER = "░";
-    private final static String BOAT_PIECE = "█";
-    private final static String BOAT_PIECE_HIT = "╬";
-    private final static String WATER_HIT = "■";
-    private final static String LINE_BREAK = "\n";
     private final String[][] yourBoard;
     private final String[][] enemyBoard;
     private final int[] allShipSizes;
-    private List<Ship> allTheShips;
+    private final List<Ship> allTheShips;
+    private final Set<Position> allShipsPositions;
     private final Set<Position> listOfPreviousAttacks;
 
     /**
@@ -32,7 +26,8 @@ public class Board {
      * Adds ships to attackers board.
      */
     public Board() {
-        this.allShipSizes = new int[]{2,3,3,4,5};
+        this.allShipsPositions = new HashSet<>();
+        this.allShipSizes = new int[]{2, 3, 3, 4, 5};
         this.allTheShips = new ArrayList<>();
         this.yourBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
         this.enemyBoard = new String[BOARD_MAX_SIZE][BOARD_MAX_SIZE];
@@ -66,7 +61,7 @@ public class Board {
         for (int rows = 0; rows < this.yourBoard.length; rows++) {
             for (int cols = 0; cols < this.yourBoard[rows].length; cols++) {
                 if (rows == 0 && cols == 0) {
-                    this.yourBoard[rows][cols] = EMPTY_SPACE;
+                    this.yourBoard[rows][cols] = EMPTY_SPACE.getSymbol();
                     continue;
                 }
                 if (rows == 0) {
@@ -79,7 +74,7 @@ public class Board {
                     numberOfCols++;
                     continue;
                 }
-                this.yourBoard[rows][cols] = Colors.BLUE + WATER + Colors.RESET;
+                this.yourBoard[rows][cols] = WATER.getSymbol();
             }
         }
     }
@@ -98,18 +93,22 @@ public class Board {
     public void addShip() {
         int nextIndex = 0;
         while (allShipSizes.length > nextIndex) {
-            Ship ship = new Ship(allShipSizes[nextIndex], new Position((int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1, (int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1));
-
+            Ship ship = generateNewShip(nextIndex);
             if (!isShipInsideBoard(ship) || isShipOnTopOfOtherShip(ship)) {
-                ship = null;
+                continue;
             }
-
-            if (ship != null) {
-                drawShipOnBoard(ship);
-                allTheShips.add(ship);
-                nextIndex++;
-            }
+            drawShipOnBoard(ship);
+            allTheShips.add(ship);
+            addPositionsAroundTheShip(ship);
+            allShipsPositions.addAll(ship.getFullShip());
+            nextIndex++;
         }
+    }
+
+    private Ship generateNewShip(int nextIndex) {
+        int newXCoord = (int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1;
+        int newYCoord = (int) Math.floor(Math.random() * BOARD_MAX_SIZE) + 1;
+        return new Ship(allShipSizes[nextIndex], new Position(newXCoord,newYCoord));
     }
 
     /**
@@ -118,10 +117,7 @@ public class Board {
      * @param ship This parameter receives a ship.
      */
     private void drawShipOnBoard(Ship ship) {
-        for (int i = 0; i < ship.getFullShip().size(); i++) {
-            this.yourBoard[ship.getFullShip().get(i).getX()][ship.getFullShip().get(i).getY()] =
-                    Colors.YELLOW + BOAT_PIECE + Colors.RESET;
-        }
+        ship.getFullShip().forEach(i->this.yourBoard[i.getX()][i.getY()] = BOAT_PIECE.getSymbol());
     }
 
     /**
@@ -131,15 +127,9 @@ public class Board {
      * @return Returns true if a boat is inside the board, and false if it is outside.
      */
     private boolean isShipInsideBoard(Ship ship) {
-        for (int i = 0; i < ship.getFullShip().size(); i++) {
-            if (ship.getFullShip().get(i).getX() < 1
-                    || ship.getFullShip().get(i).getY() < 1
-                    || ship.getFullShip().get(i).getX() > BOARD_MAX_SIZE - 1
-                    || ship.getFullShip().get(i).getY() > BOARD_MAX_SIZE - 1) {
-                return false;
-            }
-        }
-        return true;
+        return ship.getFullShip().stream()
+                .noneMatch(position -> position.getX() < 1 ||  position.getY() < 1
+                        || position.getX() > BOARD_MAX_SIZE - 1 || position.getY()> BOARD_MAX_SIZE - 1);
     }
 
     /**
@@ -149,47 +139,22 @@ public class Board {
      * @return Returns true if all conditions check out, and false if not.
      */
     private boolean isShipOnTopOfOtherShip(Ship ship) {
-        if (ship == null) {
-            return true;
-        }
-        for (int newShipPositions = 0; newShipPositions < ship.getFullShip().size(); newShipPositions++) {
-            for (int indexOfAllShips = 0; indexOfAllShips < allTheShips.size(); indexOfAllShips++) {
-                for (int shipPositions = 0; shipPositions < allTheShips.get(indexOfAllShips).getFullShip().size(); shipPositions++) {
-                    if (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).equals(ship.getFullShip().get(newShipPositions))) {
-                        return true;
-                    }
-                    if (checkIfShipsConnected(ship, newShipPositions, indexOfAllShips, shipPositions)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    //check if the new ship created is connected to the other ships
-
-    /**
-     * This method checks if the ship which was created is connected to other ships.
-     *
-     * @param ship             This parameter receives a ship.
-     * @param newShipPositions This parameter receives an int that will be the positions where the new ship will be drawn in.
-     * @param indexOfAllShips  This parameter receives an int that will be the index of all ships in the board.
-     * @param shipPositions    This parameter receives an int that will be the positions of all ships already placed on the board.
-     * @return Returns true if there are ships connected, false if there aren't.
-     */
-    private boolean checkIfShipsConnected(Ship ship, int newShipPositions, int indexOfAllShips, int shipPositions) {
-        for (int indexShipEnum = 0; indexShipEnum < ShipsENUM.values().length; indexShipEnum++) {
-            if (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).getX() == (ship.getFullShip()
-                    .get(newShipPositions).getX() + ShipsENUM.values()[indexShipEnum].getAxisX())
-                    && (allTheShips.get(indexOfAllShips).getFullShip().get(shipPositions).getY() == (ship.getFullShip()
-                    .get(newShipPositions).getY() + ShipsENUM.values()[indexShipEnum].getAxisY()))) {
+        for (int i = 0; i < ship.getFullShip().size(); i++) {
+            if (this.allShipsPositions.contains(ship.getFullShip().get(i))) {
                 return true;
             }
         }
         return false;
     }
 
+    private void addPositionsAroundTheShip(Ship ship) {
+        Arrays.stream(ShipsENUM.values())
+                .forEach(enumPositions-> ship.getFullShip()
+                        .forEach(shipPosition ->
+                                allShipsPositions.add(new Position(shipPosition.getX()+ enumPositions.getAxisX()
+                                        ,shipPosition.getY()+ enumPositions.getAxisY())))
+                );
+    }
     public List<Ship> getAllTheShips() {
         return allTheShips;
     }
@@ -203,9 +168,9 @@ public class Board {
         String boardString = "";
         for (String[] rows : this.yourBoard) {
             for (String cols : rows) {
-                boardString = boardString.concat(EMPTY_SPACE + cols + EMPTY_SPACE);
+                boardString = boardString.concat(EMPTY_SPACE.getSymbol()+ cols +EMPTY_SPACE.getSymbol());
             }
-            boardString = boardString.concat(LINE_BREAK);
+            boardString = boardString.concat(LINE_BREAK.getSymbol());
         }
         return boardString;
     }
@@ -217,11 +182,11 @@ public class Board {
      */
     public String getAdversaryBoard() {
         String newBoardString = "";
-        for (String[] strings : this.enemyBoard) {
-            for (String string : strings) {
-                newBoardString = newBoardString.concat(EMPTY_SPACE + string + EMPTY_SPACE);
+        for (String[] rows : this.enemyBoard) {
+            for (String cols : rows) {
+                newBoardString = newBoardString.concat(EMPTY_SPACE.getSymbol()+ cols +EMPTY_SPACE.getSymbol());
             }
-            newBoardString = newBoardString.concat(LINE_BREAK);
+            newBoardString = newBoardString.concat(LINE_BREAK.getSymbol());
         }
         return newBoardString;
     }
@@ -243,21 +208,18 @@ public class Board {
      * @return Returns a string, that will change how the game is played depending on what said string is.
      */
     public String hit(Position position) {
-
         if (!listOfPreviousAttacks.add(position)) {
-            return "Same position";
+            return SAME_POSITION.getSymbol();
         }
-
         if (position.getX() <= 0 || position.getY() <= 0 || position.getX() > (BOARD_MAX_SIZE - 1) || position.getY() > (BOARD_MAX_SIZE - 1)) {
-            return "Out of bounds";
+            return  OUT_OFF_BOUNDS.getSymbol();
         }
-
         if (isShip(position)) {
-            yourBoard[position.getX()][position.getY()] = Colors.RED + BOAT_PIECE_HIT + Colors.RESET;
-            return Colors.RED + BOAT_PIECE_HIT + Colors.RESET;
+            yourBoard[position.getX()][position.getY()] = BOAT_PIECE_HIT.getSymbol();
+            return BOAT_PIECE_HIT.getSymbol();
         }
-        yourBoard[position.getX()][position.getY()] = Colors.BLACK_BRIGHT + WATER_HIT + Colors.RESET;
-        return Colors.BLACK_BRIGHT + WATER_HIT + Colors.RESET;
+        yourBoard[position.getX()][position.getY()] = WATER_HIT.getSymbol();
+        return WATER_HIT.getSymbol();
     }
 
     /**
@@ -267,9 +229,6 @@ public class Board {
      * @return Returns true if the position is a ship, or false if it isn't.
      */
     private boolean isShip(Position position) {
-        if (yourBoard[position.getX()][position.getY()].equals(Colors.YELLOW + BOAT_PIECE + Colors.RESET)) {
-            return true;
-        }
-        return false;
+        return yourBoard[position.getX()][position.getY()].equals(BOAT_PIECE.getSymbol());
     }
 }

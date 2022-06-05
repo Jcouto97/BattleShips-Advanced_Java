@@ -24,7 +24,6 @@ public class Player {
     /**
      *  Connecting the player to a server
      *
-     * @param args
      */
     public static void main(String[] args) {
         Player player = new Player();

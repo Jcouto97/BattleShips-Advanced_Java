@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Ship {
-    private final int OFFSET = 4;
-    private int size; // size of the ship
-    private Position head; //   private String axis;
-    private List<Position> fullShip; // the full ship with positions
+    private final int size; // size of the ship
+    private final Position head; //   private String axis;
+    private final List<Position> fullShip; // the full ship with positions
     private int numberOfHits;
     private boolean isDead;
 
@@ -24,6 +23,7 @@ public class Ship {
      * @param position ships starting position (head)
      */
     public Ship(int size, Position position) {
+        int OFFSET = 4;
         this.fullShip = new ArrayList<>();
         this.size = size;
         this.numberOfHits = size;

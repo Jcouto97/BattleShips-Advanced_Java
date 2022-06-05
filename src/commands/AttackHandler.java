@@ -1,11 +1,14 @@
 package commands;
 
-import colors.Colors;
+import field.BoardSymbols;
 import field.ColumnENUM;
 import field.Position;
 import gameobjects.Ship;
 import gameobjects.ShipsENUM;
 import game.GameServer;
+
+import java.util.Arrays;
+import static field.BoardSymbols.*;
 import static utils.asciiArt.LOSER;
 import static utils.asciiArt.WINNER;
 
@@ -25,47 +28,44 @@ public class AttackHandler implements CommandHandler {
     @Override
     public void command(GameServer.PlayerHandler attacker, GameServer server) {
         String[] coordinates = attacker.getMessage().split(" ");
-        if(coordinates.length==1){
+        if (coordinates.length < 3) {
             return;
         }
         int columnEnumIndex = isEnum(coordinates[1].toUpperCase());
         if (columnEnumIndex == -1 || !isInt(coordinates[2])) {
             return;
         }
-
         Position hitPosition = new Position(ColumnENUM.values()[columnEnumIndex].getValue(), Integer.parseInt(coordinates[2]));
-
-        /*
-        if it is: attacks player2 board on the position provided; (first line of if condition)
-            updates defender board (changes "~" to "." or "x" depending on if it was water or a ship) (second line of if condition)
-         */
-        for (GameServer.PlayerHandler defender : server.getPlayerList()) {
-            if (!attacker.getName().equals(defender.getName()) && attacker.getPlayerGameId() == defender.getPlayerGameId()) {
-                String hit = defender.getPlayerBoard().hit(hitPosition); // defender gets hit by attacker
-                if (samePosition(attacker, hit)) {
-                    break; // checks if is the same position
-                }
-
-                if (checkOutOfBounds(attacker, hit)) {
-                    break; // check is it´s out of bounds
-                }
-
-                attacker.getPlayerBoard().updateAdversaryBoard(hitPosition, hit); //Update the attackers enemy board;
-                reDrawPlayerBoards(defender); //Redraws both of the defender boards (attacker and defender);
-
-                if (checkIfMissShip(attacker, defender, hit)) {
-                    break; // check if missed ship
-                }
-
-                shipHit(hitPosition, defender, attacker); // hit the ship and reduces its life
-                winnerAndLoser(attacker, defender); // check if there is a winner
-            }
-        }
+        /*if it is: attacks player2 board on the position provided; (first line of if condition)
+            updates defender board (changes "~" to "." or "x" depending on if it was water or a ship) (second line of if condition)*/
+        checkHit(attacker, server, hitPosition);
         for (GameServer.PlayerHandler players : server.getPlayerList()) {
-            if (attacker.getPlayerGameId() == players.getPlayerGameId()){
+            if (attacker.getPlayerGameId() == players.getPlayerGameId()) {
                 synchronized (players.getLock()) {
                     players.getLock().notifyAll();
                 }
+            }
+        }
+    }
+    private void checkHit(GameServer.PlayerHandler attacker, GameServer server, Position hitPosition) {
+        for (GameServer.PlayerHandler defender : server.getPlayerList()) {
+            if (!attacker.getName().equals(defender.getName()) && attacker.getPlayerGameId() == defender.getPlayerGameId()) {
+                String hit = defender.getPlayerBoard().hit(hitPosition); // defender gets hit by attacker
+                if (samePosition(hit)) {
+                    attacker.send("You already attacked in those coordinates, try again!");
+                    break; // checks if is the same position
+                }
+                if (checkOutOfBounds(hit)) {
+                    attacker.send("Coordinates are outside the board, try again!");
+                    break; // check is it´s out of bounds
+                }
+                attacker.getPlayerBoard().updateAdversaryBoard(hitPosition, hit); //Update the attackers enemy board;
+                reDrawPlayerBoards(defender); //Redraws both of the defender boards (attacker and defender)
+                if (checkIfMissShip(attacker, defender, hit)) {
+                    break; // check if missed ship
+                }
+                shipHit(hitPosition, defender, attacker); // hit the ship and reduces its life
+                winnerAndLoser(attacker, defender); // check if there is a winner
             }
         }
     }
@@ -73,23 +73,15 @@ public class AttackHandler implements CommandHandler {
     /**
      * Checks if hitting in the same position
      */
-    private boolean samePosition(GameServer.PlayerHandler attacker, String hit) {
-        if (hit.equals("Same position")) {
-            attacker.send("You already attacked in those coordinates, try again!");
-            return true;
-        }
-        return false;
+    private boolean samePosition(String hit) {
+        return hit.equals(SAME_POSITION.getSymbol());
     }
 
     /**
      * Check hit is it´s out of bounds (of the board)
      */
-    private boolean checkOutOfBounds(GameServer.PlayerHandler attacker, String hit) {
-        if (hit.equals("Out of bounds")) {
-            attacker.send("Coordinates are outside the board, try again!");
-            return true;
-        }
-        return false;
+    private boolean checkOutOfBounds(String hit) {
+        return hit.equals(OUT_OFF_BOUNDS.getSymbol());
     }
 
     /**
@@ -104,7 +96,7 @@ public class AttackHandler implements CommandHandler {
      * Check if attacker misses ship, in order to continue to attack
      */
     private boolean checkIfMissShip(GameServer.PlayerHandler attacker, GameServer.PlayerHandler defender, String hit) {
-        if (!hit.equals(Colors.RED + "╬" + Colors.RESET)) {
+        if (!hit.equals(BoardSymbols.BOAT_PIECE_HIT.getSymbol())) {
             attacker.setAttacker(false);
             defender.setAttacker(true);
             return true;
@@ -113,30 +105,24 @@ public class AttackHandler implements CommandHandler {
     }
 
     /**
-     *  Hit the ship and reduces its life
-     *  1º loop, iterates through array of ships;
-     *  2º loop, iterates through the ship positions;
-     *  In that position hit the ship;
-     *  If ships number of hits == 0 then set ship isDead bollean to true;
-     *  Calls shipBorder function to surround dead ship;
+     * Hit the ship and reduces its life
+     * 1º loop, iterates through array of ships;
+     * 2º loop, iterates through the ship positions;
+     * In that position hit the ship;
+     * If ships number of hits == 0 then set ship isDead bollean to true;
+     * Calls shipBorder function to surround dead ship;
      */
     private void shipHit(Position hitPosition, GameServer.PlayerHandler defender, GameServer.PlayerHandler attacker) {
-        for (int i = 0; i < defender.getPlayerBoard().getAllTheShips().size(); i++) { //inside the array of ships
-            for (int j = 0; j < defender.getPlayerBoard().getAllTheShips().get(i).getFullShip().size(); j++) { //inside the ship
-                if (defender.getPlayerBoard().getAllTheShips().get(i).getFullShip().get(j).equals(hitPosition)) { //se no ship 0 e na posiçao 0 == hit position, da hit
-                    defender.getPlayerBoard().getAllTheShips().get(i).shipHit();
-
-                    if (defender.getPlayerBoard().getAllTheShips().get(i).getNumberOfHits() == 0 //number of hits remaining to die
-                            && !defender.getPlayerBoard().getAllTheShips().get(i).isDead()) { //and if its not dead
-                        defender.getPlayerBoard().getAllTheShips().get(i).setDead();
-
-                        Ship ship = defender.getPlayerBoard().getAllTheShips().get(i);
-                        shipBorder(ship, defender, attacker); //ship border when dead
-                    }
-                    return;
-                }
-            }
-        }
+        defender.getPlayerBoard().getAllTheShips()
+                .forEach(fullShip -> fullShip.getFullShip().stream()
+                        .filter(position -> position.equals(hitPosition))
+                        .forEach((position) -> {
+                            fullShip.shipHit();
+                            if (fullShip.getNumberOfHits() == 0 && !fullShip.isDead()) {
+                                fullShip.setDead();
+                                shipBorder(fullShip, defender, attacker);
+                            }
+                        }));
     }
 
     /**
@@ -144,17 +130,20 @@ public class AttackHandler implements CommandHandler {
      * Updates attacker board and redraws defenders
      */
     private void shipBorder(Ship ship, GameServer.PlayerHandler defender, GameServer.PlayerHandler attacker) {
-        for (int i = 0; i < ship.getFullShip().size(); i++) {
-            for (int j = 0; j < ShipsENUM.values().length; j++) {
-                Position tempPosition = new Position(ship.getFullShip().get(i).getX() + ShipsENUM.values()[j].getAxisX()
-                        , ship.getFullShip().get(i).getY() + ShipsENUM.values()[j].getAxisY());
-
-                if (defender.getPlayerBoard().hit(tempPosition).equals(Colors.BLACK_BRIGHT + "■" + Colors.RESET)) {
-                    attacker.getPlayerBoard().updateAdversaryBoard(tempPosition, Colors.BLACK_BRIGHT + "■" + Colors.RESET); //update in attackers adversary board the hit
-                }
-            }
-        }
+        ship.getFullShip()
+                .forEach(shipPosition-> Arrays.stream(ShipsENUM.values())
+                        .forEach(enumPosition-> fillShipBorders(defender, attacker, shipPosition, enumPosition)));
         reDrawPlayerBoards(defender);
+    }
+
+    private void fillShipBorders(GameServer.PlayerHandler defender, GameServer.PlayerHandler attacker, Position shipPosition, ShipsENUM enumPosition) {
+        Position tempPosition = getNewPosition(shipPosition, enumPosition);
+        if(defender.getPlayerBoard().hit(tempPosition).equals(WATER_HIT.getSymbol())){
+            attacker.getPlayerBoard().updateAdversaryBoard(tempPosition, WATER_HIT.getSymbol());
+        }
+    }
+    private Position getNewPosition(Position shipPosition, ShipsENUM enumPosition) {
+        return new Position(shipPosition.getX() + enumPosition.getAxisX(), shipPosition.getY() + enumPosition.getAxisY());
     }
 
     /**
@@ -188,8 +177,7 @@ public class AttackHandler implements CommandHandler {
     /**
      * Checks if letter parameter equals to a letter from ColumnEnums
      * Returns an index to fetch letter from ColumnEnums
-     * @param letter
-     * @return
+     *
      */
     public int isEnum(String letter) {
         for (int i = 0; i < ColumnENUM.values().length; i++) {

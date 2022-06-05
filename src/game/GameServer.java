@@ -21,7 +21,7 @@ public class GameServer {
     private ExecutorService service;
     private List<PlayerHandler> playerList;
     private boolean isWaiting;
-    private final Object lock2;
+    private final Object waiting;
     private int gameIds;
     private Thread bot = null;
 
@@ -32,7 +32,7 @@ public class GameServer {
      */
     public GameServer() {
         this.gameIds = 1;
-        this.lock2 = new Object();
+        this.waiting = new Object();
         isWaiting = false;
     }
 
@@ -69,19 +69,19 @@ public class GameServer {
             bot();
         }
         if (isWaiting) {
-            synchronized (lock2) {
-                lock2.notifyAll();
+            synchronized (waiting) {
+                waiting.notifyAll();
             }
             bot.interrupt();
             chooseAttacker();
             gameIds++;
             return;
         }
-        synchronized (lock2) {
+        synchronized (waiting) {
             try {
                 player.send("Waiting for adversary to connect!");
                 isWaiting = true;
-                lock2.wait();
+                waiting.wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -177,11 +177,9 @@ public class GameServer {
         private boolean isAttacker;
         private final Object lock;
         private final Object messageLock;
-        private boolean loser;
         private boolean ready;
         private int maxNumberOfRandomBoards;
         private int playerGameId;
-        private boolean winner;
 
         /**
          *  Constructor that receives a name and a playerSocket
@@ -203,8 +201,6 @@ public class GameServer {
             this.writer = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
             this.reader = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
             this.isAttacker = false;
-            this.loser = false;
-            this.winner = false;
             this.lock = new Object();
             this.messageLock = new Object();
             this.ready = false;
@@ -223,15 +219,6 @@ public class GameServer {
             }
             return false;
         }
-
-        public void setLoser() {
-            this.loser = true;
-        }
-
-        public boolean isAttacker() {
-            return isAttacker;
-        }
-
         public void setAttacker(boolean attacker) {
             isAttacker = attacker;
         }
@@ -282,7 +269,6 @@ public class GameServer {
                     synchronized (messageLock) {
                         messageLock.wait();
                     }
-                    waitTime.interrupt();//
                     waitTime.interrupt();
                     if(message.contains("/random")){
                         continue;
@@ -329,22 +315,29 @@ public class GameServer {
             Position randomPosition;
             boolean exists;
             do {
-                exists = false;
                 firstParameter = ColumnENUM.values()[(int) Math.floor(Math.random() * (ColumnENUM.values().length - 1) + 1)];
                 secondParameter = (int) Math.floor(Math.random() * (10 - 1) + 1);
                 randomPosition = new Position(firstParameter.getValue(), secondParameter);
-                for (PlayerHandler playerHandler : playerList) {
-                    if (playerHandler.playerGameId == this.playerGameId && !playerHandler.name.equals(this.name)) {
-                        if (playerHandler.board.getListOfPreviousAttacks().contains(randomPosition)) {
-                            exists = true;
-                            break;
-                        }
-                    }
-                }
+
+                exists = checkIfAttackIsPossible(randomPosition);
+
             } while (exists);
 
-            ColumnENUM finalFirstParameter = firstParameter;
-            int finalSecondParameter = secondParameter;
+            return timeForAttack(firstParameter, secondParameter);
+        }
+
+        private boolean checkIfAttackIsPossible(Position randomPosition) {
+            for (PlayerHandler playerHandler : playerList) {
+                if (playerHandler.playerGameId == this.playerGameId && !playerHandler.name.equals(this.name)) {
+                    if (playerHandler.board.getListOfPreviousAttacks().contains(randomPosition)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private Thread timeForAttack(ColumnENUM finalFirstParameter, int finalSecondParameter) {
             Thread waitTime = new Thread(() -> {
                 try {
                     Thread.sleep(30000);
@@ -388,7 +381,6 @@ public class GameServer {
             for (PlayerHandler players : playerList) {
                 if (players.playerGameId == this.playerGameId && !players.name.equals(this.name)) {
                     players.send("\n\n" + WINNER);
-                    players.winner = true;
                     players.close();
                 }
             }
@@ -405,10 +397,9 @@ public class GameServer {
                     b.append(Colors.RED).append(s);
                     continue;
                 }
+
                 b.append(Colors.BLUE).append(s);
             }
-
-
             send(b + "\n" + Colors.RESET);
             send(PLANE + "\n" + START_BUTTON);
             try {
@@ -474,10 +465,6 @@ public class GameServer {
 
         public String getName() {
             return name;
-        }
-
-        public Socket getPlayerSocket() {
-            return playerSocket;
         }
 
         public Board getPlayerBoard() {

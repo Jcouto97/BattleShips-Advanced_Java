@@ -6,8 +6,8 @@ public enum Command {
     RANDOM ("/random", new RandomHandler()),
     READY ("/ready", new ReadyHandler());
 
-    private String description;
-    private CommandHandler handler;
+    private final String description;
+    private final CommandHandler handler;
 
     /**
      *Commands used in the chat by the players.

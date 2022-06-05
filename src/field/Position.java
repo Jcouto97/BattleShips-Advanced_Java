@@ -3,7 +3,8 @@ package field;
 import java.util.Objects;
 
 public class Position {
-    private int x, y;
+    private final int x;
+    private final int y;
 
     /**
      *
@@ -26,7 +27,6 @@ public class Position {
     /**
      * Equals and hashCode methods overriden to compare the position objects and attributes
      * @param o object paramether compared
-     * @return
      */
     @Override
     public boolean equals(Object o) {
