@@ -25,4 +25,5 @@ To run program, download 18 files and compile in IDE or using javac in terminal
 
 ## EXAMPLE OUTPUT
 
-![Screenshot 2022-06-02 163801](https://user-images.githubusercontent.com/103672168/171674503-8bb2a5f7-1402-4c07-833d-7c1a709ea338.png)
+![BattleShips – Player java 19_10_2022 14_16_39](https://user-images.githubusercontent.com/103672168/196750399-03d8e092-1dbd-4ded-b34d-7b1d45cc0f76.png)
+
